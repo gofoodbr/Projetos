@@ -3,21 +3,29 @@ class Opcional {
   String descricao;
   String produto;
   int produtoId;
+  int categoriaOpcionalProdutoId;
   String resultadoValidacao;
+  CategoriaOpcional categoria;
 
   Opcional(
-      {this.composicaoProdutoId,
-      this.descricao,
-      this.produto,
-      this.produtoId,
-      this.resultadoValidacao});
+      {
+        this.composicaoProdutoId,
+        this.descricao,
+        this.produto,
+        this.produtoId,
+        this.categoria,
+        this.categoriaOpcionalProdutoId
+      });
 
   Opcional.fromJson(Map<String, dynamic> json) {
     composicaoProdutoId = json['ComposicaoProdutoId'];
     descricao = json['Descricao'];
     produto = json['Produto'];
     produtoId = json['ProdutoId'];
-    resultadoValidacao = json['ResultadoValidacao'];
+    categoriaOpcionalProdutoId = json['CategoriaOpcionalProdutoId'];
+    categoria = json['CategoriaOpcionalProduto'] != null
+        ? new CategoriaOpcional.fromJson(json['CategoriaOpcionalProduto'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -26,7 +34,40 @@ class Opcional {
     data['Descricao'] = this.descricao;
     data['Produto'] = this.produto;
     data['ProdutoId'] = this.produtoId;
-    data['ResultadoValidacao'] = this.resultadoValidacao;
+    data['CategoriaOpcionalProdutoId'] = this.categoriaOpcionalProdutoId;
     return data;
   }
+}
+
+class CategoriaOpcional {
+  int categoriaOpcionalProdutoId;
+  String nomeCategoria;
+  int maximoOpcionais;
+  int minimoOpcionais;
+
+  CategoriaOpcional({
+     this.categoriaOpcionalProdutoId,
+     this.maximoOpcionais,
+     this.minimoOpcionais,
+     this.nomeCategoria
+  });
+
+  CategoriaOpcional.fromJson(Map<String, dynamic> json) {
+    categoriaOpcionalProdutoId = json['CategoriaOpcionalProdutoId'];
+    maximoOpcionais = json['MaximoOpcionais'];
+    minimoOpcionais = json['MinimoOpcionais'];
+    nomeCategoria = json['NomeCategoria'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['CategoriaOpcionalProdutoId'] = this.categoriaOpcionalProdutoId;
+    data['MaximoOpcionais'] = this.maximoOpcionais;
+    data['MinimoOpcionais'] = this.minimoOpcionais;
+    data['NomeCategoria'] = this.nomeCategoria;
+    return data;
+  }
+
+
+  
 }

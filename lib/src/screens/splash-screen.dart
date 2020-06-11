@@ -1,8 +1,6 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
 import 'package:go_food_br/src/app-bloc.dart';
-import 'package:go_food_br/src/components/button-app.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../app-settings.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 

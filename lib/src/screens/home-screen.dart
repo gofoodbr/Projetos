@@ -9,7 +9,6 @@ import 'package:go_food_br/src/components/companie_promo.dart';
 import 'package:go_food_br/src/components/companies.dart';
 import 'package:go_food_br/src/components/location.dart';
 import 'package:go_food_br/src/components/search.dart';
-import 'package:go_food_br/src/model/banner_card.dart';
 import 'package:go_food_br/src/model/bottom_navigator_item.dart';
 import 'package:go_food_br/src/model/company-model.dart';
 import '../app-bloc.dart';
@@ -30,13 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
   }
-
-  final List<CardImageItem> banners = [
-    CardImageItem(image: 'assets/images/restaurantes-0.png', text: 'Confira sua entrega grátis na sacola'),
-    CardImageItem(image: 'assets/images/restaurantes-1.png', text: 'A taxa é corterisa para voce'),
-    CardImageItem(image: 'assets/images/restaurantes-2.png', text: 'Comida gostosa e sem taxas'),
-    CardImageItem(image: 'assets/images/retirar.png', text: 'Peça e retira no restaurante'),
-  ];
 
   final List<BottomNavigatorItem> menus = [
     BottomNavigatorItem(icon: Icons.home, text: 'Início', ),

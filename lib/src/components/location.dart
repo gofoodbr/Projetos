@@ -21,7 +21,7 @@ class Location extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Image.asset("assets/images/logo_pink.png",
+            Image.asset("assets/images/logo_pink_home.png",
               height: ScreenUtil().setHeight(70),
             ),
             GestureDetector(

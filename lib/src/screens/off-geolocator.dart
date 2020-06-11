@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:go_food_br/src/app-settings.dart';
 
