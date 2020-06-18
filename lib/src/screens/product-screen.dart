@@ -278,12 +278,17 @@ class _ProductScreenState extends State<ProductScreen> {
                                     opcional.saborProdutoId)
                                 .length;
                             double precoSabor = 0;
-                            if (snapshot.data[index].valorTotal != null) {
+                             if (double.parse(snapshot.data[index].valorTotal) > 0) {
                               precoSabor =
                                   double.parse(snapshot.data[index].valorTotal);
+                            
+                              if (!product.company.preferenciaMaiorPrecoSabor) {
+                                precoSabor = precoSabor / snapshotQnt.data;
+                              }
                             }
-                            if (!product.company.preferenciaMaiorPrecoSabor) {
-                              precoSabor = precoSabor / snapshotQnt.data;
+                            else{
+                              product.precoVenda = (double.parse(product.precoVendaPromocional) > 0 ? 
+                                 double.parse(product.precoVendaPromocional) : double.parse(product.precoVenda)).toString();
                             }
                             return GestureDetector(
                               onTap: () {
@@ -312,9 +317,10 @@ class _ProductScreenState extends State<ProductScreen> {
                                                 fontSize:
                                                     ScreenUtil().setSp(30),
                                               ),
-                                            ),
+                                            ),                                            
                                             Text(
-                                              formatPrice(precoSabor),
+                                              precoSabor > 0 
+                                                 ? formatPrice(precoSabor) : '',
                                               style: GoogleFonts.poppins(
                                                 color: Colors.grey,
                                                 fontSize:
@@ -440,7 +446,14 @@ class _ProductScreenState extends State<ProductScreen> {
                     shrinkWrap: true,
                     sectionsCount: categorias.length,
                     countOfItemInSection: (int section) {
-                      return categorias.length;
+                      var countItens = 0;
+                      if (snapshot.hasData && _groupAtual != 0) {
+                        countItens = snapshot.data
+                          .where((e) =>
+                              e.categoriaOpcionalProdutoId == _groupAtual)
+                          .length;
+                      }
+                      return countItens;
                     },
                     itemBuilder: (BuildContext context, IndexPath index) {
                       int quantidade = 0;
@@ -746,25 +759,35 @@ class _ProductScreenState extends State<ProductScreen> {
             return Container();
           }
 
-          double precoProduto = 0;
+          double precoProduto =  double.parse(product.precoVendaPromocional) == 0
+                ? double.parse(product.precoVenda) : double.parse(product.precoVendaPromocional);
+
           if (product.company.preferenciaMaiorPrecoSabor &&
-              product.sabores.length > 0) {
+              product.sabores.length > 0) 
+          {
             double maiorPrecoSabor = 0;
-            for (Sabor sabor in product.sabores) {
-              if (double.parse(sabor.valorTotal) > maiorPrecoSabor)
-                maiorPrecoSabor = double.parse(sabor.valorTotal);
+            for (Sabor sabor in product.sabores) 
+            {
+              if (double.parse(sabor.valorTotal) > 0)
+              {
+                if (double.parse(sabor.valorTotal) > maiorPrecoSabor)
+                  maiorPrecoSabor = double.parse(sabor.valorTotal);
+              }
             }
-            precoProduto = maiorPrecoSabor;
-          } else if (!product.company.preferenciaMaiorPrecoSabor &&
-              product.sabores.length > 0) {
+            if (maiorPrecoSabor > 0)
+              precoProduto = maiorPrecoSabor;
+          } 
+          else 
+          if (!product.company.preferenciaMaiorPrecoSabor && product.sabores.length > 0) 
+          {
+            double proporcionalPrecoSabor = 0;
             for (Sabor sabor in product.sabores) {
-              precoProduto += double.parse(sabor.valorTotal) / snapshot.data;
+              if (double.parse(sabor.valorTotal) > 0)
+                proporcionalPrecoSabor += double.parse(sabor.valorTotal) / snapshot.data;
             }
-          } else {
-            double.parse(product.precoVendaPromocional) == 0
-                ? precoProduto = double.parse(product.precoVenda)
-                : precoProduto = double.parse(product.precoVendaPromocional);
-          }
+            if (proporcionalPrecoSabor > 0)
+              precoProduto = proporcionalPrecoSabor;            
+          } 
 
           List<Complemento> complementos = product.complementos;
           double valorComplementos = 0;
@@ -974,9 +997,9 @@ class _ProductScreenState extends State<ProductScreen> {
             height: ScreenUtil().setHeight(5),
           ),
           Text(
-            double.parse(product.precoVendaPromocional ?? "0") == 0
-                ? formatPrice(double.parse(product.precoVenda))
-                : formatPrice(double.parse(product.precoVendaPromocional)),
+            double.parse(product.precoVendaPromocional) > 0
+                ? formatPrice(double.parse(product.precoVendaPromocional))
+                : formatPrice(double.parse(product.precoVenda)),
             style: GoogleFonts.poppins(
                 fontSize: ScreenUtil().setSp(31), fontWeight: FontWeight.w500),
           ),

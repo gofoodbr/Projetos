@@ -40,7 +40,7 @@ Future<List<Opcional>> getOpcionaisService({
   try {
     Response response = await dio.get(
         "$urlApi/Composicao/obter-por-produto?id=$productId",
-    ).timeout(Duration(seconds: 20)).catchError((e) {
+    ).timeout(Duration(seconds: 60)).catchError((e) {
       throw e;
     });
     if (response.statusCode == 200) {
@@ -75,11 +75,7 @@ Future<List<Sabor>> getSaboresService({
       print(response.data);
       List<Sabor> listSabor = [];
       for(var a in response.data){
-        Sabor newSabor = Sabor.fromJson(a);
-        if(double.parse(newSabor.valorTotal) > 0){
-          listSabor.add(Sabor.fromJson(a));
-        }
-      
+          listSabor.add(Sabor.fromJson(a));      
       }
       return listSabor;
     } else {

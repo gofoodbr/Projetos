@@ -82,7 +82,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                Text("O troco deve ser maior que o valor total",
+                                Text("Informe o valor para troco, igual ou maior que o valor da compra",
                                 textAlign: TextAlign.center,
                                   style: GoogleFonts.poppins(
                                     fontSize: ScreenUtil().setSp(34)

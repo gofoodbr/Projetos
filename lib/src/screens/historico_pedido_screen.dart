@@ -255,7 +255,7 @@ class _HistoricoPedidoState extends State<HistoricoPedido> {
             ),
           )
         ) : Container(),
-        isOpen && pedido.empresa.telefone != null ? FlatButton(onPressed: ()async{
+        pedido.empresa.telefone != null ? FlatButton(onPressed: ()async{
           
           String url = 'tel:${pedido.empresa.telefone}';
             if (await canLaunch(url)) {

@@ -26,7 +26,7 @@ String formatPrice(double value){
 
 double getValorProduto(Product product){
   double valorProduto = 0;
-  if(product.precoVendaPromocional != "null" && double.parse(product.precoVendaPromocional) > 0){
+  if(double.parse(product.precoVendaPromocional) > 0){
     valorProduto += double.parse(product.precoVendaPromocional);
   }else{
     valorProduto += double.parse(product.precoVenda);
@@ -35,15 +35,19 @@ double getValorProduto(Product product){
   if(product.company.preferenciaMaiorPrecoSabor && product.sabores.length > 0){
     double maiorPrecoSabor = 0;
     for(Sabor sabor in product.sabores){
-      if(double.parse(sabor.valorTotal) > maiorPrecoSabor) maiorPrecoSabor = double.parse(sabor.valorTotal);
+      if (double.parse(sabor.valorTotal) > 0)
+        if(double.parse(sabor.valorTotal) > maiorPrecoSabor) maiorPrecoSabor = double.parse(sabor.valorTotal);
     }
-    valorProduto = maiorPrecoSabor;
+    if (maiorPrecoSabor > 0)
+      valorProduto = maiorPrecoSabor;
   }else if(!product.company.preferenciaMaiorPrecoSabor && product.sabores.length > 0){
     double preco = 0;
     for(Sabor sabor in product.sabores){
-      preco += double.parse(sabor.valorTotal) / product.sabores.length;
+      if (double.parse(sabor.valorTotal) > 0)
+        preco += double.parse(sabor.valorTotal) / product.sabores.length;
     }
-    valorProduto = preco;
+    if (preco > 0)
+      valorProduto = preco;
   }
 
   for(Complemento c in product.complementos){

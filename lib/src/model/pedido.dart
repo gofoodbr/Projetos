@@ -37,10 +37,11 @@ class Pedido {
   int statusPedidoId;
   List<PedidoItens> pedidoItens;
   List<HistoricoStatusPedidos> historicoStatusPedidos;
-
   String empresaNome;
   String content;
   String contentType;
+  bool pagamentoOnline;
+  int cartaoClienteDeliveryId;
 
   Pedido(
       {this.pedidoId,
@@ -83,7 +84,9 @@ class Pedido {
       this.valorTotal,
       this.statusPedidoId,
       this.pedidoItens,
-      this.historicoStatusPedidos});
+      this.historicoStatusPedidos,
+      this.pagamentoOnline,
+      this.cartaoClienteDeliveryId});
 
   Pedido.fromJson(Map<String, dynamic> json) {
     pedidoId = json['PedidoId'];
@@ -128,6 +131,8 @@ class Pedido {
     content = json["Content"];
     contentType = json["ContentType"];
     statusPedidoId = json['StatusPedidoId'];
+    pagamentoOnline = json['PagamentoOnline'];
+    cartaoClienteDeliveryId = json['CartaoClienteDeliveryId'];
     if (json['PedidoItens'] != null) {
       pedidoItens = new List<PedidoItens>();
       json['PedidoItens'].forEach((v) {
@@ -182,6 +187,8 @@ class Pedido {
     data['SubTotal'] = this.subTotal;
     data['ValorTotal'] = this.valorTotal;
     data['StatusPedidoId'] = this.statusPedidoId;
+    data['PagamentoOnline'] = this.pagamentoOnline;
+    data['CartaoClienteDeliveryId'] = this.cartaoClienteDeliveryId;
     if (this.pedidoItens != null) {
       data['PedidoItens'] = this.pedidoItens.map((v) => v.toJson()).toList();
     }

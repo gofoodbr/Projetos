@@ -354,14 +354,14 @@ Future<bool> setPedidoService(AppBloc appBloc, {
             "ValorAcrescimo": valorAcrescimo,
             "ValorPago": valorPago,
             "ValorDesconto": valorDesconto,
-            "SubTotal": valorTotal,
+            "SubTotal": valorTotal, 
             "ValorTotal":  valorTotal + double.parse(company.valorFrete) - valorDesconto - cashBack,
             "ValorCashBack": cashBack,
             "PagoComCashBack": cashBack > 0,
             "PedidoItens": listProductsCarrinho
           }
         
-    ).timeout(Duration(seconds: 40)).catchError((e) {
+    ).timeout(Duration(seconds: 120)).catchError((e) {
       throw e;
     });
     print(response.data);
