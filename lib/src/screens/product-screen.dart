@@ -73,10 +73,10 @@ class _ProductScreenState extends State<ProductScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       _headImage(image),
-                      _title(snapshot.data),
-                      _selectComplemento(product: snapshot.data),
+                      _title(snapshot.data),                      
                       _selectOpcionais(product: snapshot.data),
                       _selectSabores(product: snapshot.data),
+                      _selectComplemento(product: snapshot.data),
                       observacao()
                     ],
                   ),
@@ -447,10 +447,10 @@ class _ProductScreenState extends State<ProductScreen> {
                     sectionsCount: categorias.length,
                     countOfItemInSection: (int section) {
                       var countItens = 0;
-                      if (snapshot.hasData && _groupAtual != 0) {
+                      if (snapshot.hasData) {
                         countItens = snapshot.data
                           .where((e) =>
-                              e.categoriaOpcionalProdutoId == _groupAtual)
+                              e.categoriaOpcionalProdutoId == categorias[section].categoriaOpcionalProdutoId)
                           .length;
                       }
                       return countItens;

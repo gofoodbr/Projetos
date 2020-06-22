@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_food_br/src/app-settings.dart';
 import 'package:go_food_br/src/blocs/company-screen-bloc.dart';
+import 'package:go_food_br/src/model/FormaPagamentoDelivery.dart';
 import 'package:go_food_br/src/model/complemento-model.dart';
 import 'package:go_food_br/src/model/endereco-model.dart';
 import 'package:go_food_br/src/model/opcional.dart';
-import 'package:go_food_br/src/model/payment.dart';
 import 'package:go_food_br/src/model/product-model.dart';
 import 'package:go_food_br/src/model/sabor.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,8 +45,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      bottomSheet: StreamBuilder<Payment>(
-        stream: appBloc.paymentOut,
+      bottomSheet: StreamBuilder<FormaPagamentoDelivery>(
+        stream: appBloc.formapagamentoOut,
         builder: (context, snapshot) {
           return Material(
             elevation: 20,
@@ -82,7 +82,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                Text("Informe o valor para troco, igual ou maior que o valor da compra",
+                                Text("O troco deve ser maior que o valor total",
                                 textAlign: TextAlign.center,
                                   style: GoogleFonts.poppins(
                                     fontSize: ScreenUtil().setSp(34)
@@ -167,15 +167,15 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                 height: ScreenUtil().setHeight(20),
                               ),
                               StreamBuilder(
-                                stream: appBloc.paymentOut,
+                                stream: appBloc.formapagamentoOut,
                                 builder: (context, snapshot){
                                   return Row(
                                     children: <Widget>[
                                       Container(
                                         width: ScreenUtil().setWidth(100),
-                                        child: Image.network("$urlApi${snapshot.data.formaPagamentoDelivery.imagemUrl}"),
+                                        child: Image.network("$urlApi${snapshot.data.imagemUrl}"),
                                       ),
-                                      Text(snapshot.data.formaPagamentoDelivery.nome)
+                                      Text(snapshot.data.nome)
                                     ],
                                   );
                                 },
@@ -858,8 +858,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                   ),
                 ),
               ),
-              StreamBuilder<Payment>(
-                stream: appBloc.paymentOut,
+              StreamBuilder<FormaPagamentoDelivery>(
+                stream: appBloc.formapagamentoOut,
                 builder: (context, snapshot) {
                   if(!snapshot.hasData || snapshot.data.formaPagamentoDeliveryId != 2){
                     return Container();
@@ -940,8 +940,8 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                     SizedBox(
                       height: ScreenUtil().setHeight(15),
                     ),
-                    StreamBuilder<Payment>(
-                      stream: appBloc.paymentOut,
+                    StreamBuilder<FormaPagamentoDelivery>(
+                      stream: appBloc.formapagamentoOut,
                       builder: (context, snapshot){
                         if(!snapshot.hasData){
                           return Container(
@@ -971,9 +971,10 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                   },
                                   leading: Container(
                                     width: ScreenUtil().setWidth(100),
-                                    child: Image.network("$urlApi${snapshot.data.formaPagamentoDelivery.imagemUrl}"),
+                                    child: Image.network("$urlApi${snapshot.data.imagemUrl}"),
                                   ),
-                                  title: Text(snapshot.data.formaPagamentoDelivery.nome),
+                                  title: Text(snapshot.data.pagamentoEntrega == true ? snapshot.data.nome
+                                               : appBloc.getCardSelected().numeroCartao),
                                 ),
                             ListTile(
                               onTap: (){
@@ -1004,3 +1005,4 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
     );
   }
 }
+  

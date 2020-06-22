@@ -22,7 +22,7 @@ class CompanyCard extends StatelessWidget {
     }
     return GestureDetector(
       onTap: (){
-        if(company.aberto != "false" && company.offline != "false")
+        if(company.aberto == "true" && company.offline == "false")
         {
           companyScreenBloc.addCompany(company);
           Navigator.pushNamed(context, "/company_screen");
@@ -59,7 +59,7 @@ class CompanyCard extends StatelessWidget {
                     )
                   )
                 ),
-                (company.aberto != "false" && company.offline != "false")  ? Container(
+                (company.aberto == "true" && company.offline == "false")  ? Container(
                   
                 ) : Container(
                   color: Colors.black.withOpacity(0.4) ,

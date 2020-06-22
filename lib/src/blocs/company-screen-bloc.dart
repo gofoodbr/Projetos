@@ -56,7 +56,6 @@ class CompanyScreenBloc extends BlocBase{
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _gruposController.close();
     _productsController.close();

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_food_br/src/app-bloc.dart';
 import 'package:go_food_br/src/app-settings.dart';
 import 'package:go_food_br/src/model/banner.dart';
+import 'package:go_food_br/src/model/cartao_cliente.dart';
 import 'package:go_food_br/src/model/categories.dart';
 import 'package:go_food_br/src/model/company-model.dart';
 import 'package:go_food_br/src/model/cupom.dart';
@@ -11,6 +12,7 @@ import 'package:go_food_br/src/model/payment.dart';
 import 'package:go_food_br/src/model/user-model.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'model/FormaPagamentoDelivery.dart';
 import 'model/product-model.dart';
 
 
@@ -229,7 +231,7 @@ Future<bool> getPaymentsService(AppBloc appBloc, int empresaId) async {
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/obter-formaPagamento?empresaId=$empresaId",
-    ).timeout(Duration(seconds: 40)).catchError((e) {
+    ).timeout(Duration(seconds: 60)).catchError((e) {
       throw e;
     });
     if (response.statusCode == 200) {
@@ -257,7 +259,7 @@ Future<bool> deleteEnderecoService(AppBloc appBloc, int enderecoId) async {
   try {
     Response response = await dio.delete(
         "$urlApi/Endereco/deletar-endereco?enderecoId=$enderecoId",
-    ).timeout(Duration(seconds: 40)).catchError((e) {
+    ).timeout(Duration(seconds: 60)).catchError((e) {
       throw e;
     });
     if (response.statusCode == 200) {
@@ -282,7 +284,7 @@ Future<bool> cupomRequestService(AppBloc appBloc, String value) async {
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/valida-cupom?codigoCupom=$value&clienteId=${appBloc.userModel.clienteId}",
-    ).timeout(Duration(seconds: 40)).catchError((e) {
+    ).timeout(Duration(seconds: 60)).catchError((e) {
       throw e;
     });
     if (response.statusCode == 200 && response.data != null) {
@@ -304,7 +306,8 @@ Future<bool> setPedidoService(AppBloc appBloc, {
   UserModel userModel,
   List<Product> listProducts,
   Cupom cupom,
-  Payment payment,
+  FormaPagamentoDelivery payment,
+  CartaoCliente card,
   EnderecoModel enderecoModel,
   double valorPago,
   double cashBack
@@ -358,7 +361,9 @@ Future<bool> setPedidoService(AppBloc appBloc, {
             "ValorTotal":  valorTotal + double.parse(company.valorFrete) - valorDesconto - cashBack,
             "ValorCashBack": cashBack,
             "PagoComCashBack": cashBack > 0,
-            "PedidoItens": listProductsCarrinho
+            "PedidoItens": listProductsCarrinho,
+            "PagamentoOnline" : card != null,
+            "CartaoClienteDeliveryId" : card != null ? card.cartaoClienteDeliveryId : "",
           }
         
     ).timeout(Duration(seconds: 120)).catchError((e) {

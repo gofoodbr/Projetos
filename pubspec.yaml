@@ -11,7 +11,7 @@ description: Gofood delivery.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.1+9
+version: 1.0.2+11
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -20,6 +20,7 @@ dependencies:
   group_list_view: ^1.0.5
   location: ^3.0.2
   flutter_masked_text: ^0.8.0
+  awesome_card: ^1.1.0
   flutter:
     sdk: flutter
 
