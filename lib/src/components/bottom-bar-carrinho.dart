@@ -62,7 +62,7 @@ Widget bottomBarCarrinho(AppBloc appBloc, BuildContext context){
                 horizontal: ScreenUtil().setWidth(20)
               ),
               color: primaryColor,
-              height: ScreenUtil().setHeight(80),
+              height: ScreenUtil().setHeight(90),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[

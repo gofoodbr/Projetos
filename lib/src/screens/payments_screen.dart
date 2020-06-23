@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:go_food_br/src/app-settings.dart';
-import 'package:go_food_br/src/model/FormaPagamentoDelivery.dart';
 import 'package:go_food_br/src/model/cartao_cliente.dart';
 import 'package:go_food_br/src/model/payment.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,13 +16,11 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   final appBloc = BlocProvider.getBloc<AppBloc>();
-
   @override
   void initState() {
     super.initState();
     appBloc.getPayments();
     appBloc.getCards();
-    appBloc.getPaymentsOnline();
   }
 
   @override
@@ -31,15 +28,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
-        title: Text("Escolher forma de pagamento"),
+        title: Text("FORMAS DE PAGAMENTO"),
       ),
       body: SingleChildScrollView(
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[          
-          _selectPaymentOnline(),
-          _selectPaymentLocal()
-        ],
+        children: <Widget>[
+          appBloc.hasPaymentOnline() ? _selectPaymentOnline() : new Container(),
+         _selectPaymentLocal()],
       )),
     );
   }
@@ -50,7 +46,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.all(ScreenUtil().setHeight(30)),
+          padding: EdgeInsets.all(ScreenUtil().setHeight(20)),
           child: Text("Pague na entrega",
               style: GoogleFonts.poppins(
                   fontSize: ScreenUtil().setSp(35),
@@ -61,15 +57,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return Container(
-                  margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),
-                  height: ScreenUtil().setHeight(300),
-                  color: Colors.grey.shade200,
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      valueColor:
-                          new AlwaysStoppedAnimation<Color>(primaryColor),
-                    ),
-                  ));
+                      height: 40,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(
+                        valueColor:
+                            new AlwaysStoppedAnimation<Color>(primaryColor),
+                      ));
             }
             return ListView.builder(
               shrinkWrap: true,
@@ -78,9 +71,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
               itemBuilder: (context, index) {
                 return ListTile(
                   onTap: () {
-                    appBloc.formapagamentoIn(snapshot.data[index].formaPagamentoDelivery);
+                    appBloc.formapagamentoIn(
+                        snapshot.data[index].formaPagamentoDelivery);
                     //appBloc.paymentIn(snapshot.data[index]);
-                    Navigator.pop(context);
+                    Navigator.pushNamed(context, "/carrinho_screen");
                   },
                   leading: Container(
                     width: ScreenUtil().setWidth(100),
@@ -103,8 +97,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(ScreenUtil().setHeight(30)),
-            child: Text("Pague Online",
+            padding: EdgeInsets.all(ScreenUtil().setHeight(20)),
+            child: Text("Pague pelo gofood",
                 style: GoogleFonts.poppins(
                     fontSize: ScreenUtil().setSp(35),
                     fontWeight: FontWeight.w500)),
@@ -113,16 +107,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
             stream: appBloc.cardsOut,
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Container(
-                    margin: EdgeInsets.only(top: ScreenUtil().setHeight(40)),
-                    height: ScreenUtil().setHeight(300),
-                    color: Colors.grey.shade200,
-                    child: Center(
+                 return Container(
+                      height: 40,
+                      alignment: Alignment.center,
                       child: CircularProgressIndicator(
                         valueColor:
                             new AlwaysStoppedAnimation<Color>(primaryColor),
-                      ),
-                    ));
+                      ));
               }
               return ListView.builder(
                 shrinkWrap: true,
@@ -130,22 +121,57 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 itemCount: snapshot.data.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    onTap: () {                      
-                      appBloc.formapagamentoIn(snapshot.data[index].formaPagamentoDelivery);
+                    onTap: () {
+                      appBloc.formapagamentoIn(
+                          snapshot.data[index].formaPagamentoDelivery);
                       appBloc.cardIn(snapshot.data[index]);
-                      Navigator.pop(context);
+                      Navigator.pushNamed(context, "/carrinho_screen");
                     },
                     leading: Container(
                       width: ScreenUtil().setWidth(100),
                       child: Image.network(
                           "$urlApi${snapshot.data[index].formaPagamentoDelivery.imagemUrl}"),
                     ),
-                    title: Text(snapshot.data[index].numeroCartao),
+                    title: Text(snapshot.data[index].numeroCartao,
+                        style: GoogleFonts.poppins(
+                            color: Colors.black,
+                            fontSize: ScreenUtil().setSp(35),
+                            fontWeight: FontWeight.w500)),
                   );
                 },
               );
             },
           ),
+          Padding(
+              padding: EdgeInsets.all(ScreenUtil().setHeight(20)),
+              child: Row(children: <Widget>[
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Adiconar Cartão de Crédito",
+                      style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: ScreenUtil().setSp(30),
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ],
+                ),
+                Expanded(child: Container()),
+                CircleAvatar(
+                    radius: 25,
+                    backgroundColor: primaryColor,
+                    child: IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: ScreenUtil().setHeight(60),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/register_card_screen");
+                        })),
+              ]))
         ]));
   }
 }

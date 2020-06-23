@@ -31,9 +31,11 @@ class Company {
   String distanciaCliente;
   String classificao;
   String descontoGofood;
-  String gofoodAtivo;
   String offline;
   bool preferenciaMaiorPrecoSabor;
+  bool baneseCardAtivo;
+  bool zoopAtivo;
+  String gofoodAtivo;
 
   Company(
       {this.empresaId,
@@ -70,7 +72,10 @@ class Company {
         this.classificao,
         this.descontoGofood,
         this.offline,
-        this.gofoodAtivo});
+        this.gofoodAtivo,
+        this.baneseCardAtivo,
+        this.zoopAtivo
+        });
 
   Company.fromJson(Map<String, dynamic> json) {
     empresaId = json['EmpresaId'];
@@ -110,6 +115,8 @@ class Company {
     gofoodAtivo = json['GofoodAtivo'].toString();
     offline = json['Offline'].toString();
     preferenciaMaiorPrecoSabor = json['PreferenciaMaiorPrecoSabor'];
+    zoopAtivo = json['ZoopAtivo'];
+    baneseCardAtivo = json['BaneseCardAtivo'];
   }
 
   Map<String, dynamic> toJson() {
@@ -150,6 +157,8 @@ class Company {
     data['DescontoGofood'] = this.descontoGofood;
     data['Offline'] = this.offline;
     data['GofoodAtivo'] = this.gofoodAtivo;
+    data['ZoopAtivo'] = this.zoopAtivo;
+    data['BaneseCardAtivo'] = this.baneseCardAtivo;
     return data;
   }
 }

@@ -31,7 +31,7 @@ Future<bool> _getLocation({int timeOut, AppBloc appBloc}) async {
     LocationData location = await _locationService.getLocation()
         .timeout(_timeOut)
         .catchError((e) {
-      throw e;
+       throw e;
     });
 
     appBloc.location = location;

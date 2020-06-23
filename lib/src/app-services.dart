@@ -317,7 +317,8 @@ Future<bool> setPedidoService(AppBloc appBloc, {
 
   List<Map<String,dynamic>> listProductsCarrinho = [];
   double valorAcrescimo = 0;
-  double valorTotal = 0;
+  double valorTotal = 0;  
+  double valorFrete = 0;
 
   for(Product product in listProducts){
     listProductsCarrinho.add(product.toCarrinho());
@@ -331,6 +332,8 @@ Future<bool> setPedidoService(AppBloc appBloc, {
   }
 
   String date = DateTime.now().toIso8601String();
+  
+  valorFrete = payment.formaPagamentoDeliveryId == 14 ? 0 :  double.parse(company.valorFrete);
 
   try {
     Response response = await dio.post(
@@ -353,12 +356,12 @@ Future<bool> setPedidoService(AppBloc appBloc, {
             "Cep": enderecoModel.cep.replaceAll("-", "").replaceAll(".", ""),
             "Bairro": enderecoModel.bairro,
             "Observacao": enderecoModel.complemento,
-            "ValorFrete": double.parse(company.valorFrete),
+            "ValorFrete": valorFrete,
             "ValorAcrescimo": valorAcrescimo,
             "ValorPago": valorPago,
             "ValorDesconto": valorDesconto,
             "SubTotal": valorTotal, 
-            "ValorTotal":  valorTotal + double.parse(company.valorFrete) - valorDesconto - cashBack,
+            "ValorTotal":  valorTotal + valorFrete - valorDesconto - cashBack,
             "ValorCashBack": cashBack,
             "PagoComCashBack": cashBack > 0,
             "PedidoItens": listProductsCarrinho,

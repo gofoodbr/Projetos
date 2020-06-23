@@ -807,7 +807,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   width: ScreenUtil().setWidth(30),
                 ),
                 Container(
-                  height: ScreenUtil().setHeight(70),
+                  height: ScreenUtil().setHeight(90),
                   width: ScreenUtil().setWidth(200),
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade400)),
@@ -913,7 +913,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       }
                     },
                     child: Container(
-                      height: ScreenUtil().setHeight(70),
+                      height: ScreenUtil().setHeight(90),
                       decoration: BoxDecoration(color: primaryColor),
                       child: Row(
                         children: <Widget>[

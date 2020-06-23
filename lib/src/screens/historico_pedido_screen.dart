@@ -708,7 +708,9 @@ class _HistoricoPedidoState extends State<HistoricoPedido> {
         ),
         Row(
           children: <Widget>[
-            Text("Pagamento na entrega",
+            Text(
+              pedido.pagamentoOnline == true ? "Pagamento pelo gofood" :
+              "Pagamento na entrega",
               style: TextStyle(
                 color: Colors.black,
                 fontSize: ScreenUtil().setSp(30),

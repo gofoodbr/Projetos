@@ -75,10 +75,13 @@ class AppBloc extends BlocBase {
   Stream<Payment> get paymentOut => _paymentController.stream;
 
   final _formapagamentoController = BehaviorSubject<FormaPagamentoDelivery>();
-  Function(FormaPagamentoDelivery) get formapagamentoIn => _formapagamentoController.sink.add;
-  Stream<FormaPagamentoDelivery> get formapagamentoOut => _formapagamentoController.stream;
+  Function(FormaPagamentoDelivery) get formapagamentoIn =>
+      _formapagamentoController.sink.add;
+  Stream<FormaPagamentoDelivery> get formapagamentoOut =>
+      _formapagamentoController.stream;
 
-  final _paymentsOnlineController = BehaviorSubject<List<FormaPagamentoDelivery>>();
+  final _paymentsOnlineController =
+      BehaviorSubject<List<FormaPagamentoDelivery>>.seeded([]);
   Function(List<FormaPagamentoDelivery>) get paymentsOnlineIn =>
       _paymentsOnlineController.sink.add;
   Stream<List<FormaPagamentoDelivery>> get paymentsOnlineOut =>
@@ -100,6 +103,15 @@ class AppBloc extends BlocBase {
 
   List<Company> getListCompanies() {
     return _companiesController.value;
+  }
+
+    bool hasPaymentOnline() { 
+    Company empresa = getCarrinho()[0].company;   
+    if (empresa.baneseCardAtivo == null || empresa.zoopAtivo == null)
+      return false;
+    if (empresa.baneseCardAtivo || empresa.zoopAtivo) 
+      return true;
+    return false;  
   }
 
   void initApp() async {
@@ -184,17 +196,17 @@ class AppBloc extends BlocBase {
     convidado = true;
     loadData(convidado: true);
   }
-  
+
   CartaoCliente getCardSelected() {
     return _cardController.value;
   }
 
-  EnderecoModel getEnderecoSelected(){
+  EnderecoModel getEnderecoSelected() {
     return getListEnderecos()[0];
   }
-  
-  getPaymentsOnline() {
-    getPaymentsOnlineService(this, getCarrinho()[0].company.empresaId);
+
+  getPaymentsOnline() async {
+    return await getPaymentsOnlineService(this, getCarrinho()[0].company.empresaId);
   }
 
   getCards() {
@@ -252,11 +264,9 @@ class AppBloc extends BlocBase {
       String ano,
       String cvv,
       String mes}) async {
-    loadIn(1);
-
     bool register = await registerCardService(
         formaPagamentoDeliveryId: formaPagamentoDeliveryId,
-        empresaId:  getCarrinho()[0].company.empresaId,
+        empresaId: getCarrinho()[0].company.empresaId,
         clienteDeliveryId: userModel.clienteId,
         numeroCartao: numeroCartao,
         nomeTitular: nomeTitular,
@@ -270,7 +280,7 @@ class AppBloc extends BlocBase {
       return 6;
     }
   }
-  
+
   Future<String> confirmPedido() async {
     loadIn(null);
     double valorTotal = 0;
@@ -279,10 +289,10 @@ class AppBloc extends BlocBase {
       valorTotal += product.toCarrinho()["ValorTotal"];
     }
 
-    double valorDesconto = 0;
-    if (cupom != null) {
-      valorDesconto =
-          (double.parse(cupom.descontoPremiacao) / 100) * valorTotal;
+    if (getCarrinho()[0].company.pedidoMinimo != null &&
+        double.parse(getCarrinho()[0].company.pedidoMinimo) > valorTotal) {
+      loadIn(100);    
+      return "Pedido menor que o valor minino permitido!";
     }
 
     bool value = await setPedidoService(
@@ -317,6 +327,5 @@ class AppBloc extends BlocBase {
     _cardsController.close();
     _cardController.close();
     _formapagamentoController.close();
-
   }
 }

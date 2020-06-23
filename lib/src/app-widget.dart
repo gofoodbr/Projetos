@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
           "/troco_screen": (context) => TrocoScreen(),
           "/pedidos_screen": (context)=> PedidosScreen(),
           "/historico_pedido": (context) => HistoricoPedido(),
-          "/Register_card_screen": (context) => RegisterCardScreen()
+          "/register_card_screen": (context) => RegisterCardScreen()
         },
       ),
     );

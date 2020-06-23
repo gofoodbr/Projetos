@@ -26,7 +26,7 @@ class _CompanyScreenState extends State<CompanyScreen> {
   void initState() {
     super.initState();
     companyScreenBloc.getDataCompany();
-    companyScreenBloc.gruposSelectIn([]);
+    companyScreenBloc.gruposSelectIn([]);     
   }
 
   @override
