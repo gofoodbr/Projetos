@@ -1,4 +1,6 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:go_food_br/src/app-settings.dart';
 import 'package:go_food_br/src/blocs/filter-bloc.dart';
@@ -13,12 +15,22 @@ import 'package:go_food_br/src/model/bottom_navigator_item.dart';
 import 'package:go_food_br/src/model/company-model.dart';
 import '../app-bloc.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget{
+  HomeScreen({Key key, this.title, this.analytics, this.observer})
+      : super(key: key);
+
+  final String title;
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState(analytics, observer);
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  _HomeScreenState(this.analytics, this.observer);
+
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
 
   final appBloc = BlocProvider.getBloc<AppBloc>();
   final filterBloc = BlocProvider.getBloc<FilterBloc>();
@@ -26,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 

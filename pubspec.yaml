@@ -11,13 +11,15 @@ description: Gofood delivery.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.2+12
+version: 1.0.2+13
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
   group_list_view: ^1.0.5
+  firebase_analytics: ^5.0.11
+  flutter_local_notifications: ^1.4.4+1
   location: ^3.0.2
   flutter_masked_text: ^0.8.0
   awesome_card: ^1.1.0
@@ -25,7 +27,7 @@ dependencies:
     sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
-  # Use with the Cupertino Icons class for iOS style icons.
+  # Use with the Cupertino Icons class for iOS st yle icons.
   cupertino_icons: ^0.1.2
   bloc_pattern: ^2.5.1
   google_fonts: ^0.3.10

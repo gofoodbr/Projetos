@@ -56,7 +56,7 @@ class _RegisterCardScreenState extends State<RegisterCardScreen> {
       key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: primaryColor,
-        title: Text("CARTÃO DE CRÉDITO"),
+        title: Text("Cartão de Crédito"),
       ),
       body: SingleChildScrollView(
         child: isLoading

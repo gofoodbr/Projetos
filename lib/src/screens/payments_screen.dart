@@ -28,7 +28,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
-        title: Text("FORMAS DE PAGAMENTO"),
+        title: Text("Formas de Pagamento"),
       ),
       body: SingleChildScrollView(
           child: Column(

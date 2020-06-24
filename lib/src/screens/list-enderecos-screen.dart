@@ -135,7 +135,7 @@ Widget enderecoTile(EnderecoModel enderecoModel, {bool selected, AppBloc appBloc
     onTap: (){
       appBloc.loadIn(100);
       appBloc.setEndereco(enderecoModel).then((success){
-        if(success) appBloc.loadIn(0);
+        if(success) appBloc.loadIn(1);
         else appBloc.loadIn(2);
       });
     },
