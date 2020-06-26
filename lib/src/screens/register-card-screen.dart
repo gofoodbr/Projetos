@@ -27,6 +27,7 @@ class _RegisterCardScreenState extends State<RegisterCardScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   String cardNumber = "";
   String cardHolderName = "";
+  String cpf = "";
   String expiryDate = "";
   String cvv = "";
   bool showBack = false;
@@ -121,11 +122,11 @@ class _RegisterCardScreenState extends State<RegisterCardScreen> {
                         ),
                         child: TextFormField(
                           decoration: InputDecoration(hintText: "Validade"),
-                          maxLength: 7,
+                          maxLength: 5,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             MaskedTextInputFormatter(
-                              mask: 'xx/xxxx',
+                              mask: 'xx/xx',
                               separator: '/',
                             ),
                           ],
@@ -165,6 +166,27 @@ class _RegisterCardScreenState extends State<RegisterCardScreen> {
                           focusNode: _focusNode,
                         ),
                       ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 15,
+                        ),
+                        child: TextFormField(
+                          decoration: InputDecoration(hintText: "CPF"),
+                          maxLength: 14,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            MaskedTextInputFormatter(
+                              mask: 'xxx.xxx.xxx.xx',
+                              separator: '.',
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              cpf = value;
+                            });
+                          },
+                        ),
+                      ),
                     ],
                   ),
                   Padding(
@@ -181,10 +203,11 @@ class _RegisterCardScreenState extends State<RegisterCardScreen> {
                                 .registerCardUser(
                                     formaPagamentoDeliveryId: 19,
                                     numeroCartao: cardNumber,
-                                    mes: expiryDate.split("/")[0],
-                                    ano: expiryDate.split("/")[1],
+                                    mes: expiryDate,
+                                    ano: expiryDate,
                                     nomeTitular: cardHolderName,
-                                    cvv: cvv)
+                                    cvv: cvv,
+                                    cpf: cpf)
                                 .then((result) {
                               if (result == 6) {
                                 setState(() {

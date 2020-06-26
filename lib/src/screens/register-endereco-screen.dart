@@ -30,7 +30,6 @@ class _RegisterEnderecoScreenState extends State<RegisterEnderecoScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     apelidoController = TextEditingController();
     cepController = MaskedTextController(mask: "00.000-000");
@@ -76,7 +75,7 @@ class _RegisterEnderecoScreenState extends State<RegisterEnderecoScreen> {
           return ListView(
             children: <Widget>[
               header(firstName(appBloc.userModel?.nome?? "")),
-              dataInput("Identificação",
+              dataInput("Ex:Casa ou Trabalho",
                 controller: apelidoController
               ),
               dataInput("CEP",

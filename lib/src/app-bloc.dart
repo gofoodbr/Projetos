@@ -263,17 +263,18 @@ class AppBloc extends BlocBase {
       String nomeTitular,
       String ano,
       String cvv,
-      String mes}) async {
+      String mes,
+      String cpf}) async {
     bool register = await registerCardService(
         formaPagamentoDeliveryId: formaPagamentoDeliveryId,
         empresaId: getCarrinho()[0].company.empresaId,
         clienteDeliveryId: userModel.clienteId,
         numeroCartao: numeroCartao,
         nomeTitular: nomeTitular,
-        ano: ano,
-        cpf: userModel.cpf,
+        ano: "20" + ano.split("/")[1],
+        cpf: cpf.replaceAll(".", ""),
         cvv: cvv,
-        mes: mes);
+        mes: mes.split("/")[0]);
     if (register) {
       return 5;
     } else {
