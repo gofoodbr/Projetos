@@ -12,6 +12,11 @@ Future<List<Complemento>> getComplementosService({
   try {
     Response response = await dio.get(
         "$urlApi/Complemento/obter-por-produto?id=$productId",
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              })
     ).timeout(Duration(seconds: 20)).catchError((e) {
       throw e;
     });
@@ -40,6 +45,11 @@ Future<List<Opcional>> getOpcionaisService({
   try {
     Response response = await dio.get(
         "$urlApi/Composicao/obter-por-produto?id=$productId",
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              })
     ).timeout(Duration(seconds: 60)).catchError((e) {
       throw e;
     });
@@ -68,6 +78,11 @@ Future<List<Sabor>> getSaboresService({
   try {
     Response response = await dio.get(
         "$urlApi/Sabor/obter-por-produto?id=$productId",
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              })
     ).timeout(Duration(seconds: 20)).catchError((e) {
       throw e;
     });

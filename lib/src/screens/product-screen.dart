@@ -30,7 +30,7 @@ class _ProductScreenState extends State<ProductScreen> {
     super.initState();
     itemBloc.getComplemento();
     itemBloc.getOpcionais();
-    itemBloc.getSabores();
+    itemBloc.getSabores();  
   }
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -73,7 +73,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       _headImage(image),
-                      _title(snapshot.data),                      
+                      _title(snapshot.data),
                       _selectOpcionais(product: snapshot.data),
                       _selectSabores(product: snapshot.data),
                       _selectComplemento(product: snapshot.data),
@@ -278,17 +278,22 @@ class _ProductScreenState extends State<ProductScreen> {
                                     opcional.saborProdutoId)
                                 .length;
                             double precoSabor = 0;
-                             if (double.parse(snapshot.data[index].valorTotal) > 0) {
+                            if (double.parse(snapshot.data[index].valorTotal) >
+                                0) {
                               precoSabor =
                                   double.parse(snapshot.data[index].valorTotal);
-                            
+
                               if (!product.company.preferenciaMaiorPrecoSabor) {
                                 precoSabor = precoSabor / snapshotQnt.data;
                               }
-                            }
-                            else{
-                              product.precoVenda = (double.parse(product.precoVendaPromocional) > 0 ? 
-                                 double.parse(product.precoVendaPromocional) : double.parse(product.precoVenda)).toString();
+                            } else {
+                              product.precoVenda =
+                                  (double.parse(product.precoVendaPromocional) >
+                                              0
+                                          ? double.parse(
+                                              product.precoVendaPromocional)
+                                          : double.parse(product.precoVenda))
+                                      .toString();
                             }
                             return GestureDetector(
                               onTap: () {
@@ -317,10 +322,11 @@ class _ProductScreenState extends State<ProductScreen> {
                                                 fontSize:
                                                     ScreenUtil().setSp(30),
                                               ),
-                                            ),                                            
+                                            ),
                                             Text(
-                                              precoSabor > 0 
-                                                 ? formatPrice(precoSabor) : '',
+                                              precoSabor > 0
+                                                  ? formatPrice(precoSabor)
+                                                  : '',
                                               style: GoogleFonts.poppins(
                                                 color: Colors.grey,
                                                 fontSize:
@@ -449,85 +455,123 @@ class _ProductScreenState extends State<ProductScreen> {
                       var countItens = 0;
                       if (snapshot.hasData) {
                         countItens = snapshot.data
-                          .where((e) =>
-                              e.categoriaOpcionalProdutoId == categorias[section].categoriaOpcionalProdutoId)
-                          .length;
+                            .where((e) =>
+                                e.categoriaOpcionalProdutoId ==
+                                categorias[section].categoriaOpcionalProdutoId)
+                            .length;
                       }
                       return countItens;
                     },
                     itemBuilder: (BuildContext context, IndexPath index) {
-                      int quantidade = 0;
+                      int quantidade = product.opcionais
+                          .where((opcional) =>
+                              snapshot.data[index.index].composicaoProdutoId ==
+                              opcional.composicaoProdutoId &&
+                              opcional.categoriaOpcionalProdutoId == _groupAtual)
+                          .length;
                       var opcionaisCatList = new List<Opcional>();
                       if (snapshot.hasData) {
-                       opcionaisCatList = snapshot.data
-                          .where((e) =>
-                              e.categoriaOpcionalProdutoId == _groupAtual)
-                          .toList();
-
-                       quantidade = product.opcionais
-                          .where((opcional) =>
-                              opcional.composicaoProdutoId ==
-                              opcionaisCatList[index.index].composicaoProdutoId)
-                          .length;
+                        opcionaisCatList = snapshot.data
+                            .where((e) =>
+                                e.categoriaOpcionalProdutoId == _groupAtual)
+                            .toList();
                       }
-
-                      return GestureDetector(
-                        onTap: () {
-                          itemBloc.addOpcionais(opcionaisCatList[index.index]);
-                        },
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              color: Colors.white,
-                              height: ScreenUtil().setHeight(100),
-                              child: Row(
-                                children: <Widget>[
-                                  SizedBox(
-                                    width: ScreenUtil().setWidth(40),
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                      return Container(
+                          child: Column(
+                        children: <Widget>[
+                          Container(
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  color: Colors.white,
+                                  height: ScreenUtil().setHeight(120),
+                                  child: Row(
                                     children: <Widget>[
-                                      Text(
-                                        opcionaisCatList[index.index].descricao,
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.black,
-                                          fontSize: ScreenUtil().setSp(30),
-                                        ),
+                                      SizedBox(
+                                        width: ScreenUtil().setWidth(40),
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              Text(
+                                                opcionaisCatList[index.index]
+                                                    .descricao,
+                                                style: GoogleFonts.poppins(
+                                                  color: Colors.black,
+                                                  fontSize:
+                                                      ScreenUtil().setSp(30),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: <Widget>[
+                                              double.parse(opcionaisCatList[
+                                                              index.index]
+                                                          .valorTotal) >
+                                                      0
+                                                  ? Text(
+                                                      "+ ${formatPrice(double.parse(opcionaisCatList[index.index].valorTotal))}  ",
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        color: Colors.grey,
+                                                        fontSize: ScreenUtil()
+                                                            .setSp(27),
+                                                      ),
+                                                    )
+                                                  : Text(""),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Expanded(child: Container()),
+                                      quantidade == 0
+                                          ? Container()
+                                          : IconButton(
+                                              icon: Icon(
+                                                Icons.remove,
+                                                color: primaryColor,
+                                                size:
+                                                    ScreenUtil().setHeight(30),
+                                              ),
+                                              onPressed: () {
+                                                 itemBloc.removeOpcionais(
+                                                opcionaisCatList[index.index]);
+                                              }),
+                                      quantidade == 0
+                                          ? Container()
+                                          : Text("${quantidade.toString()}"),
+                                      IconButton(
+                                          icon: Icon(
+                                            Icons.add,
+                                            color: primaryColor,
+                                            size: ScreenUtil().setHeight(30),
+                                          ),
+                                          onPressed: () {
+                                            itemBloc.addOpcionais(
+                                                opcionaisCatList[index.index]);
+                                          }),
+                                      SizedBox(
+                                        width: ScreenUtil().setWidth(20),
                                       ),
                                     ],
                                   ),
-                                  Expanded(child: Container()),
-                                  quantidade > 0
-                                      ? CircleAvatar(
-                                          backgroundColor: primaryColor,
-                                          radius: ScreenUtil().setHeight(25),
-                                          child: CircleAvatar(
-                                            backgroundColor:
-                                                Colors.grey.shade200,
-                                            radius: ScreenUtil().setHeight(15),
-                                          ),
-                                        )
-                                      : CircleAvatar(
-                                          backgroundColor: Colors.grey.shade200,
-                                          radius: ScreenUtil().setHeight(25),
-                                        ),
-                                  SizedBox(
-                                    width: ScreenUtil().setWidth(20),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                Container(
+                                  height: 1,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Colors.grey.shade300,
+                                ),
+                              ],
                             ),
-                            Container(
-                              height: 0,
-                              width: MediaQuery.of(context).size.width,
-                              color: Colors.grey.shade300,
-                            ),
-                          ],
-                        ),
-                      );
+                          )
+                        ],
+                      ));
                     },
                     groupHeaderBuilder: (BuildContext context, int section) {
                       setGrupoAtual(
@@ -759,35 +803,31 @@ class _ProductScreenState extends State<ProductScreen> {
             return Container();
           }
 
-          double precoProduto =  double.parse(product.precoVendaPromocional) == 0
-                ? double.parse(product.precoVenda) : double.parse(product.precoVendaPromocional);
+          double precoProduto = double.parse(product.precoVendaPromocional) == 0
+              ? double.parse(product.precoVenda)
+              : double.parse(product.precoVendaPromocional);
 
           if (product.company.preferenciaMaiorPrecoSabor &&
-              product.sabores.length > 0) 
-          {
+              product.sabores.length > 0) {
             double maiorPrecoSabor = 0;
-            for (Sabor sabor in product.sabores) 
-            {
-              if (double.parse(sabor.valorTotal) > 0)
-              {
+            for (Sabor sabor in product.sabores) {
+              if (double.parse(sabor.valorTotal) > 0) {
                 if (double.parse(sabor.valorTotal) > maiorPrecoSabor)
                   maiorPrecoSabor = double.parse(sabor.valorTotal);
               }
             }
-            if (maiorPrecoSabor > 0)
-              precoProduto = maiorPrecoSabor;
-          } 
-          else 
-          if (!product.company.preferenciaMaiorPrecoSabor && product.sabores.length > 0) 
-          {
+            if (maiorPrecoSabor > 0) precoProduto = maiorPrecoSabor;
+          } else if (!product.company.preferenciaMaiorPrecoSabor &&
+              product.sabores.length > 0) {
             double proporcionalPrecoSabor = 0;
             for (Sabor sabor in product.sabores) {
               if (double.parse(sabor.valorTotal) > 0)
-                proporcionalPrecoSabor += double.parse(sabor.valorTotal) / snapshot.data;
+                proporcionalPrecoSabor +=
+                    double.parse(sabor.valorTotal) / snapshot.data;
             }
             if (proporcionalPrecoSabor > 0)
-              precoProduto = proporcionalPrecoSabor;            
-          } 
+              precoProduto = proporcionalPrecoSabor;
+          }
 
           List<Complemento> complementos = product.complementos;
           double valorComplementos = 0;
@@ -797,6 +837,16 @@ class _ProductScreenState extends State<ProductScreen> {
                   double.parse(f.produtoComplemento.precoVenda);
             });
           }
+
+          List<Opcional> opcionais = product.opcionais;
+          double valorOpcional = 0;
+          if (opcionais != null) {
+            opcionais.forEach((f) {
+              valorOpcional = valorOpcional +
+                  double.parse(f.valorTotal);
+            });
+          }
+
           return Container(
             height: ScreenUtil().setHeight(130),
             decoration: BoxDecoration(
@@ -928,7 +978,7 @@ class _ProductScreenState extends State<ProductScreen> {
                           ),
                           Expanded(child: Container()),
                           Text(
-                            formatPrice((precoProduto + valorComplementos) *
+                            formatPrice((precoProduto + valorComplementos + valorOpcional) *
                                 product.quantidade),
                             style: GoogleFonts.poppins(
                                 color: Colors.white,

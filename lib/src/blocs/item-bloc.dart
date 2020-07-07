@@ -89,19 +89,6 @@ class ItemBloc extends BlocBase {
     _listSaboresController.sink.add(null);
   }
 
-  void addComplemento(Complemento complemento) {
-    if (!complemento.obrigatorio) {
-      List<Complemento> listComplementos =
-          _productsController.value.complementos ?? [];
-      listComplementos.add(complemento);
-
-      Product product = _productsController.value;
-      product.complementos = listComplementos;
-
-      _productsController.sink.add(product);
-    }
-  }
-
   String addCarrinho(AppBloc appBloc, String obs) {
     _productsController.value.observacaoProdutos = obs;
     _productsController.sink.add(_productsController.value);
@@ -151,27 +138,16 @@ class ItemBloc extends BlocBase {
     }
   }
 
-  void addOpcionais(Opcional opcional) {
-    List<Opcional> listOpcionais = _productsController.value.opcionais ?? [];
-    if (listOpcionais.contains(opcional)) {
-      listOpcionais.remove(opcional);
+  void addComplemento(Complemento complemento) {
+    if (!complemento.obrigatorio) {
+      List<Complemento> listComplementos =
+          _productsController.value.complementos ?? [];
+      listComplementos.add(complemento);
+
       Product product = _productsController.value;
-      product.opcionais = listOpcionais;
+      product.complementos = listComplementos;
+
       _productsController.sink.add(product);
-    } else {
-      var opcionalCategiriaIncluso = _productsController.value.opcionais
-          .where((e) =>
-              e.categoriaOpcionalProdutoId ==
-              opcional.categoriaOpcionalProdutoId)
-          .toList();
-      if (opcionalCategiriaIncluso == null ||
-          opcionalCategiriaIncluso.length <
-              opcional.categoria.maximoOpcionais) {
-        listOpcionais.add(opcional);
-        Product product = _productsController.value;
-        product.opcionais = listOpcionais;
-        _productsController.sink.add(product);
-      }
     }
   }
 
@@ -186,6 +162,37 @@ class ItemBloc extends BlocBase {
 
       _productsController.sink.add(product);
     }
+  }
+
+  void addOpcionais(Opcional opcional) {
+    List<Opcional> listOpcionais = _productsController.value.opcionais ?? [];
+
+    var totalItensCategoria = _productsController.value.opcionais
+        .where((e) =>
+            e.categoriaOpcionalProdutoId == opcional.categoriaOpcionalProdutoId).length;
+
+    var opcionalCategiriaIncluso = _productsController.value.opcionais
+        .where((e) =>
+            e.categoriaOpcionalProdutoId == opcional.categoriaOpcionalProdutoId
+            && e.composicaoProdutoId == opcional.composicaoProdutoId)
+        .toList();
+    if (opcionalCategiriaIncluso == null ||
+        totalItensCategoria < opcional.categoria.maximoOpcionais) {
+      listOpcionais.add(opcional);
+      Product product = _productsController.value;
+      product.opcionais = listOpcionais;
+      _productsController.sink.add(product);
+    }
+  }
+
+  void removeOpcionais(Opcional opcional) {
+    List<Opcional> listOpcionais = _productsController.value.opcionais ?? [];
+    listOpcionais.remove(opcional);
+
+    Product product = _productsController.value;
+    product.opcionais = listOpcionais;
+
+    _productsController.sink.add(product);
   }
 
   void addQnt({bool remove = false}) {

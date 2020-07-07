@@ -5,6 +5,7 @@ class Opcional {
   int produtoId;
   int categoriaOpcionalProdutoId;
   String resultadoValidacao;
+  String valorTotal; 
   CategoriaOpcional categoria;
 
   Opcional(
@@ -13,6 +14,7 @@ class Opcional {
         this.descricao,
         this.produto,
         this.produtoId,
+        this.valorTotal,
         this.categoria,
         this.categoriaOpcionalProdutoId
       });
@@ -21,6 +23,7 @@ class Opcional {
     composicaoProdutoId = json['ComposicaoProdutoId'];
     descricao = json['Descricao'];
     produto = json['Produto'];
+    valorTotal = json['ValorTotal'].toString() == 'null' ? '0' : json['ValorTotal'].toString();
     produtoId = json['ProdutoId'];
     categoriaOpcionalProdutoId = json['CategoriaOpcionalProdutoId'];
     categoria = json['CategoriaOpcionalProduto'] != null
@@ -33,6 +36,7 @@ class Opcional {
     data['ComposicaoProdutoId'] = this.composicaoProdutoId;
     data['Descricao'] = this.descricao;
     data['Produto'] = this.produto;
+    data['ValorTotal'] = this.valorTotal;
     data['ProdutoId'] = this.produtoId;
     data['CategoriaOpcionalProdutoId'] = this.categoriaOpcionalProdutoId;
     return data;

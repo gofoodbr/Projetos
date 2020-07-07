@@ -19,8 +19,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
-    appBloc.getPayments();
-    appBloc.getCards();
   }
 
   @override

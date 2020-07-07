@@ -12,6 +12,11 @@ Future<bool> getPaymentsOnlineService(AppBloc appBloc, int empresaId) async {
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/obter-formaPagamento-online?empresaId=$empresaId",
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              })
     ).timeout(Duration(seconds: 40)).catchError((e) {
       throw e;
     });
@@ -40,6 +45,11 @@ Future<bool> getCardsService(AppBloc appBloc, int clienteId) async {
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/obter-cartoes_cliente?clienteId=$clienteId",
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              })
     ).timeout(Duration(seconds: 40)).catchError((e) {
       throw e;
     });
@@ -77,6 +87,11 @@ Future<bool> registerCardService({
   try {
     Response response = await dio.post(
         "$urlApi/Pedido/registrar-cartao-cliente",
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              }),
         data: {
           "ClienteDeliveryId": clienteDeliveryId,
           "FormaPagamentoDeliveryId": formaPagamentoDeliveryId,

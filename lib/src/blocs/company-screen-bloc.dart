@@ -34,6 +34,10 @@ class CompanyScreenBloc extends BlocBase{
     this.company = company;
   }
 
+  Company getCompany(){
+    return this.company;
+  }
+
   getDataCompany()async{
     _gruposController.sink.add([]);
     _productsController.sink.add({});

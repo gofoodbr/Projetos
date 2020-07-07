@@ -14,6 +14,11 @@ Future<bool> registerUserService({
   try {
     Response response = await dio.post(
       "$urlApi/Cliente/registrar-cliente",
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              }),
       data: {
         "Nome": firebaseUser.displayName,
         "Sexo": sexo,
@@ -59,6 +64,11 @@ Future<bool> registerEnderecoService({
   try {
     Response response = await dio.post(
         "$urlApi/Endereco/registrar-endereco",
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              }),
         data: {
           "EnderecoId": 0,
           "Identificacao": apelido,

@@ -62,12 +62,12 @@ class _FilterScreenState extends State<FilterScreen> {
         elevation: 20,
         onTap: (value){
          
-          if(value == 1) Navigator.popAndPushNamed(context, '/filter_screen');
+          if(value == 1) Navigator.pushReplacementNamed(context, '/filter_screen');
           if(!appBloc.convidado){
-            if(value == 3) Navigator.popAndPushNamed(context, '/profile_screen');
-            if(value == 2) Navigator.popAndPushNamed(context, "/pedidos_screen");
+            if(value == 3) Navigator.pushReplacementNamed(context, '/profile_screen');
+            if(value == 2) Navigator.pushReplacementNamed(context, "/pedidos_screen");
           }
-          if(value == 0) Navigator.pop(context);
+          if(value == 0) Navigator.pushReplacementNamed(context, "/home");
         },
         items: _buildBottomIcon(),
       ),

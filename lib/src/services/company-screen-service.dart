@@ -14,6 +14,11 @@ Future<bool> getGruposCompany({
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/obter-grupos?empresaId=${company.empresaId}",
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              })
     ).timeout(Duration(seconds: 20)).catchError((e) {
       throw e;
     });
@@ -44,7 +49,12 @@ Future<List<Product>> getProductsCompany({
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/obter-produtos?empresaId=${company.empresaId}",
-    ).timeout(Duration(seconds: 20)).catchError((e) {
+          options: Options(
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              })
+    ).timeout(Duration(seconds: 60)).catchError((e) {
       throw e;
     });
     if (response.statusCode == 200) {

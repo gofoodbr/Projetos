@@ -99,7 +99,7 @@ class HistoricoBloc extends BlocBase {
     _pedidoController.value.historicoStatusPedidos = status;
     _pedidoController.sink.add(_pedidoController.value);
     sendNotificationPedido(_pedidoController.value);
-    Future.delayed(Duration(seconds: 10)).then((value) {
+    Future.delayed(Duration(seconds: 30)).then((value) {
       loopingStatus(id);
     });
   }

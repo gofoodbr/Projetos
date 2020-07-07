@@ -12,6 +12,7 @@ import 'package:go_food_br/src/services/geolocation-service.dart';
 import 'package:location/location.dart';
 import 'package:rxdart/rxdart.dart';
 import 'app-services.dart';
+import 'blocs/company-screen-bloc.dart';
 import 'model/FormaPagamentoDelivery.dart';
 import 'model/cartao_cliente.dart';
 import 'model/categories.dart';
@@ -95,6 +96,8 @@ class AppBloc extends BlocBase {
   Function(CartaoCliente) get cardIn => _cardController.sink.add;
   Stream<CartaoCliente> get cardOut => _cardController.stream;
 
+  final companyScreenBloc = BlocProvider.getBloc<CompanyScreenBloc>();
+
   FormaPagamentoDelivery getPayment() => _formapagamentoController.value;
 
   List<EnderecoModel> getListEnderecos() {
@@ -105,25 +108,18 @@ class AppBloc extends BlocBase {
     return _companiesController.value;
   }
 
-    bool hasPaymentOnline() { 
-    Company empresa = getCarrinho()[0].company;   
+  bool hasPaymentOnline() {
+    Company empresa = companyScreenBloc.getCompany();
     if (empresa.baneseCardAtivo == null || empresa.zoopAtivo == null)
       return false;
-    if (empresa.baneseCardAtivo || empresa.zoopAtivo) 
-      return true;
-    return false;  
+    if (empresa.baneseCardAtivo || empresa.zoopAtivo) return true;
+    return false;
   }
 
   void initApp() async {
     var internet = await checkInternetAccess();
     if (!internet) {
       loadIn(1);
-      return;
-    }
-
-    await getLocation(timeOut: 10, appBloc: this);
-    if (location == null) {
-      loadIn(10);
       return;
     }
 
@@ -144,7 +140,6 @@ class AppBloc extends BlocBase {
     if (user != null) {
       firebaseUser = user;
       loadData();
-      return;
     } else {
       loadIn(3);
       return;
@@ -152,7 +147,6 @@ class AppBloc extends BlocBase {
   }
 
   void loadData({bool convidado = false}) async {
-    loadIn(100);
     if (!convidado) await getUser(this, credential: firebaseUser.uid);
     if (userModel != null) {
       bool success = convidado ? true : await getEndereco();
@@ -161,18 +155,9 @@ class AppBloc extends BlocBase {
           loadIn(5);
           return;
         }
-        bool categories = await getCategories(this);
-        bool bannerOk = await getBanner(this);
 
-        if (!categories || !bannerOk) {
-          loadIn(7);
-          return;
-        }
-        bool companies = await getCompanies();
-        if (!companies) {
-          loadIn(8);
-          return;
-        }
+        getCategories(this);
+        getBanner(this);
         loadIn(2);
         return;
       } else {
@@ -185,7 +170,13 @@ class AppBloc extends BlocBase {
     }
   }
 
-  void modoConvidado() {
+  Future<void> modoConvidado() async {
+    await getLocation(1, timeOut: 10, appBloc: this);
+    if (location == null) {
+      await getLocation(1, timeOut: 10, appBloc: this);
+      return;
+    }
+
     UserModel user = UserModel(ativo: true, nome: "Convidado");
     userModel = user;
     EnderecoModel enderecoModel = EnderecoModel(
@@ -206,7 +197,8 @@ class AppBloc extends BlocBase {
   }
 
   getPaymentsOnline() async {
-    return await getPaymentsOnlineService(this, getCarrinho()[0].company.empresaId);
+    return await getPaymentsOnlineService(
+        this, companyScreenBloc.getCompany().empresaId);
   }
 
   getCards() {
@@ -244,7 +236,7 @@ class AppBloc extends BlocBase {
   List<Product> getCarrinho() => _carrinhoController.value;
 
   getPayments() {
-    getPaymentsService(this, getCarrinho()[0].company.empresaId);
+    getPaymentsService(this, companyScreenBloc.getCompany().empresaId);
   }
 
   Future<bool> deleteEndereco(int id) async {
@@ -292,7 +284,7 @@ class AppBloc extends BlocBase {
 
     if (getCarrinho()[0].company.pedidoMinimo != null &&
         double.parse(getCarrinho()[0].company.pedidoMinimo) > valorTotal) {
-      loadIn(100);    
+      loadIn(100);
       return "Pedido menor que o valor minino permitido!";
     }
 

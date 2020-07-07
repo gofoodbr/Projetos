@@ -3,7 +3,7 @@ import 'package:go_food_br/src/app-bloc.dart';
 import 'package:go_food_br/src/model/endereco-model.dart';
 import 'package:location/location.dart';
 
-Future<Null> getLocation({int timeOut, AppBloc appBloc}) async {
+Future<Null> getLocation(int i, {int timeOut, AppBloc appBloc}) async {
   bool result;
   int contador = 1;
   while (contador <= 3) {
