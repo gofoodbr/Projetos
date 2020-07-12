@@ -87,6 +87,7 @@ Widget cardPromo(Company company, BuildContext context, CompanyScreenBloc compan
                     height: ScreenUtil().setHeight(130),
                     fit: BoxFit.fitWidth,
                   ),
+                  company.lojaPromocao && company.descontoGofood == 'null' ? Container() :
                   Positioned(
                     top: ScreenUtil().setHeight(5),
                     left: ScreenUtil().setWidth(5),

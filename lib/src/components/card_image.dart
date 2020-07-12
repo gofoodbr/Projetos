@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../app-settings.dart';
-
 class CardImage extends StatelessWidget {
   final String image;
   final String text;
@@ -37,13 +35,13 @@ class CardImage extends StatelessWidget {
                     ? Image(image : AdvancedNetworkImage(
                           image,
                           useDiskCache: true,
-                          cacheRule: CacheRule(maxAge: const Duration(days: 7)),
+                          cacheRule: CacheRule(maxAge: const Duration(days: 1)),
                         ),
                         width: ScreenUtil().setWidth(450))
                     : Image(image : AdvancedNetworkImage(
                           image,
                           useDiskCache: true,
-                          cacheRule: CacheRule(maxAge: const Duration(days: 7)),
+                          cacheRule: CacheRule(maxAge: const Duration(days: 1)),
                         ), width: ScreenUtil().setWidth(170)),
               ),
             ),
@@ -75,8 +73,8 @@ enum CardImageType {
 
 double handleImageHeight(CardImageType type) {
   final banners = {
-    CardImageType.banner: 70.0,
-    CardImageType.category: 140.0,
+    CardImageType.banner: 210.0,
+    CardImageType.category: 130.0,
   };
   return banners[type];
 }

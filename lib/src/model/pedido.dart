@@ -507,7 +507,7 @@ class ComposicaoPedidoItens {
   ComposicaoPedidoItens.fromJson(Map<String, dynamic> json) {
     composicaoPedidoItemId = json['ComposicaoPedidoItemId'];
     descricao = json['Descricao'];
-    quantidade = json['Quantidade'];
+    quantidade = json['Quantidade'].toString();
     pedidoItemId = json['PedidoItemId'];
   }
 

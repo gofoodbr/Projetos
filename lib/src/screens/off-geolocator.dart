@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
 import 'package:go_food_br/src/app-settings.dart';
-import 'package:go_food_br/src/model/endereco-model.dart';
 import 'package:go_food_br/src/services/geolocation-service.dart';
 import 'package:location/location.dart';
 

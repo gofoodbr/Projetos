@@ -7,6 +7,7 @@ import 'package:go_food_br/src/app-bloc.dart';
 import 'package:go_food_br/src/blocs/company-screen-bloc.dart';
 import 'package:go_food_br/src/blocs/item-bloc.dart';
 import 'package:go_food_br/src/components/bottom-bar-carrinho.dart';
+import 'package:go_food_br/src/components/product_promo.dart';
 import 'package:go_food_br/src/model/grupo-model.dart';
 import 'package:go_food_br/src/model/product-model.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,9 +26,10 @@ class _CompanyScreenState extends State<CompanyScreen> {
   @override
   void initState() {
     super.initState();
+    companyScreenBloc.getDataCompany();
+    companyScreenBloc.gruposSelectIn([]);
+    companyScreenBloc.allproductsIn([]);
     if (appBloc.getCarrinho().length == 0) {
-      companyScreenBloc.getDataCompany();
-      companyScreenBloc.gruposSelectIn([]);
       appBloc.getPayments();
       appBloc.getCards();
     }
@@ -205,6 +207,19 @@ class _CompanyScreenState extends State<CompanyScreen> {
                   ],
                 ),
               ),
+              StreamBuilder(
+                  stream: companyScreenBloc.allproductsOut,
+                  builder: (context, snapshot) {
+                    List<Product> productsPromo = [];
+                    if (snapshot.hasData) {
+                      productsPromo.addAll(snapshot.data);
+                      productsPromo.retainWhere(
+                          (a) => double.parse(a.precoVendaPromocional) > 0);
+                    }
+                    return productsPromo.length == 0
+                        ? Container()
+                        : ProductsPromo(productsPromo);
+                  }),
               StreamBuilder<List<GrupoModel>>(
                   stream: companyScreenBloc.gruposOut,
                   builder: (context, snapshot) {
@@ -388,6 +403,9 @@ Widget productTile(Product product, BuildContext context, ItemBloc itemBloc,
     child: InkWell(
       onTap: () {
         product.company = companyScreenBloc.company;
+        product.opcionais.clear();
+        product.sabores.clear();
+        product.complementos.clear();
         itemBloc.productsIn(product);
         Navigator.pushNamed(context, "/item_screen");
       },
@@ -421,7 +439,7 @@ Widget productTile(Product product, BuildContext context, ItemBloc itemBloc,
                               fontSize: ScreenUtil().setSp(25)),
                         ),
                         SizedBox(
-                          height: ScreenUtil().setHeight(20),
+                          height: ScreenUtil().setHeight(15),
                         ),
                         double.parse(product.precoVendaPromocional == "null"
                                     ? "0"
@@ -431,7 +449,7 @@ Widget productTile(Product product, BuildContext context, ItemBloc itemBloc,
                                 "A partir de ${formatPrice(double.parse(product.precoVenda))}",
                                 style: GoogleFonts.poppins(
                                     fontWeight: FontWeight.w500,
-                                    fontSize: ScreenUtil().setSp(27)),
+                                    fontSize: ScreenUtil().setSp(28)),
                               )
                             : RichText(
                                 text: TextSpan(children: [
@@ -455,7 +473,7 @@ Widget productTile(Product product, BuildContext context, ItemBloc itemBloc,
                                 ]),
                               ),
                         SizedBox(
-                          height: ScreenUtil().setHeight(20),
+                          height: ScreenUtil().setHeight(50),
                         ),
                       ],
                     ),

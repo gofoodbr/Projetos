@@ -143,7 +143,6 @@ class HistoricoBloc extends BlocBase {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _pedidoController.close();
     _loadController.close();

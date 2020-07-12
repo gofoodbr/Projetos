@@ -65,7 +65,7 @@ class _PedidosScreenState extends State<PedidosScreen> with SingleTickerProvider
             if(value == 3) Navigator.pushReplacementNamed(context, '/profile_screen');
             if(value == 2) Navigator.pushReplacementNamed(context, "/pedidos_screen");
           }
-          if(value == 0) Navigator.pushReplacementNamed(context, "/home");;
+          if(value == 0) Navigator.pushReplacementNamed(context, "/home");
         },
         items: _buildBottomIcon(),
       ),

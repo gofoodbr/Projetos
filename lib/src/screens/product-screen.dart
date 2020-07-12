@@ -30,7 +30,7 @@ class _ProductScreenState extends State<ProductScreen> {
     super.initState();
     itemBloc.getComplemento();
     itemBloc.getOpcionais();
-    itemBloc.getSabores();  
+    itemBloc.getSabores();
   }
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -463,12 +463,6 @@ class _ProductScreenState extends State<ProductScreen> {
                       return countItens;
                     },
                     itemBuilder: (BuildContext context, IndexPath index) {
-                      int quantidade = product.opcionais
-                          .where((opcional) =>
-                              snapshot.data[index.index].composicaoProdutoId ==
-                              opcional.composicaoProdutoId &&
-                              opcional.categoriaOpcionalProdutoId == _groupAtual)
-                          .length;
                       var opcionaisCatList = new List<Opcional>();
                       if (snapshot.hasData) {
                         opcionaisCatList = snapshot.data
@@ -476,6 +470,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                 e.categoriaOpcionalProdutoId == _groupAtual)
                             .toList();
                       }
+
                       return Container(
                           child: Column(
                         children: <Widget>[
@@ -530,7 +525,12 @@ class _ProductScreenState extends State<ProductScreen> {
                                         ],
                                       ),
                                       Expanded(child: Container()),
-                                      quantidade == 0
+                                      itemBloc.obterQuantidadeItensOpcional(
+                                                  opcionaisCatList[index.index]
+                                                      .categoriaOpcionalProdutoId,
+                                                  opcionaisCatList[index.index]
+                                                      .composicaoProdutoId) ==
+                                              0
                                           ? Container()
                                           : IconButton(
                                               icon: Icon(
@@ -540,12 +540,26 @@ class _ProductScreenState extends State<ProductScreen> {
                                                     ScreenUtil().setHeight(30),
                                               ),
                                               onPressed: () {
-                                                 itemBloc.removeOpcionais(
-                                                opcionaisCatList[index.index]);
+                                                itemBloc.removeOpcionais(
+                                                    opcionaisCatList[
+                                                        index.index]);
                                               }),
-                                      quantidade == 0
+                                      itemBloc.obterQuantidadeItensOpcional(
+                                                  opcionaisCatList[index.index]
+                                                      .categoriaOpcionalProdutoId,
+                                                  opcionaisCatList[index.index]
+                                                      .composicaoProdutoId) ==
+                                              0
                                           ? Container()
-                                          : Text("${quantidade.toString()}"),
+                                          : Text((itemBloc
+                                                  .obterQuantidadeItensOpcional(
+                                                      opcionaisCatList[
+                                                              index.index]
+                                                          .categoriaOpcionalProdutoId,
+                                                      opcionaisCatList[
+                                                              index.index]
+                                                          .composicaoProdutoId))
+                                              .toString()),
                                       IconButton(
                                           icon: Icon(
                                             Icons.add,
@@ -553,8 +567,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                             size: ScreenUtil().setHeight(30),
                                           ),
                                           onPressed: () {
-                                            itemBloc.addOpcionais(
-                                                opcionaisCatList[index.index]);
+                                            Opcional opcional =
+                                                opcionaisCatList[index.index];
+                                            itemBloc.addOpcionais(opcional);
                                           }),
                                       SizedBox(
                                         width: ScreenUtil().setWidth(20),
@@ -599,7 +614,7 @@ class _ProductScreenState extends State<ProductScreen> {
                               child: Container(),
                             ),
                             Text(
-                              "${product.opcionais.where((e) => e.categoriaOpcionalProdutoId == _groupAtual).length}/${categorias[section].maximoOpcionais}",
+                              "${itemBloc.obterQtdTotalCategoria(categorias[section].categoriaOpcionalProdutoId)}/${categorias[section].maximoOpcionais}",
                               style: GoogleFonts.poppins(
                                 color: Colors.black,
                                 fontSize: ScreenUtil().setSp(26),
@@ -681,11 +696,15 @@ class _ProductScreenState extends State<ProductScreen> {
                     shrinkWrap: true,
                     itemCount: snapshot.data.length,
                     itemBuilder: (context, index) {
-                      int quantidade = product.complementos
-                          .where((complemento) =>
+                      int quantidade = 0;
+                      var complementos = product.complementos.where(
+                          (complemento) =>
                               snapshot.data[index].complementoProdutoId ==
-                              complemento.complementoProdutoId)
-                          .length;
+                              complemento.complementoProdutoId);
+                      if (complementos.length > 0) {
+                        quantidade = complementos.first.quantidade;
+                      }
+
                       return Container(
                         child: Column(
                           children: <Widget>[
@@ -769,8 +788,10 @@ class _ProductScreenState extends State<ProductScreen> {
                                         size: ScreenUtil().setHeight(30),
                                       ),
                                       onPressed: () {
-                                        itemBloc.addComplemento(
-                                            snapshot.data[index]);
+                                        Complemento complemento =
+                                            snapshot.data[index];
+                                        complemento.quantidade = quantidade + 1;
+                                        itemBloc.addComplemento(complemento);
                                       }),
                                   SizedBox(
                                     width: ScreenUtil().setWidth(20),
@@ -834,7 +855,8 @@ class _ProductScreenState extends State<ProductScreen> {
           if (complementos != null) {
             complementos.forEach((f) {
               valorComplementos = valorComplementos +
-                  double.parse(f.produtoComplemento.precoVenda);
+                  (double.parse(f.produtoComplemento.precoVenda) *
+                      f.quantidade);
             });
           }
 
@@ -842,8 +864,8 @@ class _ProductScreenState extends State<ProductScreen> {
           double valorOpcional = 0;
           if (opcionais != null) {
             opcionais.forEach((f) {
-              valorOpcional = valorOpcional +
-                  double.parse(f.valorTotal);
+              valorOpcional =
+                  valorOpcional + (double.parse(f.valorTotal) * f.quantidade);
             });
           }
 
@@ -904,7 +926,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       String result =
                           itemBloc.addCarrinho(appBloc, obsController.text);
                       if (result == null) {
-                        Navigator.pop(context);
+                        Navigator.pushNamed(context, "/company_screen");
                       } else {
                         if (result == "modal") {
                           showRoundedModalBottomSheet(
@@ -978,7 +1000,9 @@ class _ProductScreenState extends State<ProductScreen> {
                           ),
                           Expanded(child: Container()),
                           Text(
-                            formatPrice((precoProduto + valorComplementos + valorOpcional) *
+                            formatPrice((precoProduto +
+                                    valorComplementos +
+                                    valorOpcional) *
                                 product.quantidade),
                             style: GoogleFonts.poppins(
                                 color: Colors.white,

@@ -110,9 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     List<Company> companiesPromo = [];
                     companiesPromo.addAll(snapshot.data);
                     companiesPromo
-                        .retainWhere((a) => a.descontoGofood != "null");
-                    companiesPromo.sort((a, b) => double.parse(b.descontoGofood)
-                        .compareTo(double.parse(a.descontoGofood)));
+                        .retainWhere((a) => a.descontoGofood != "null" || a.lojaPromocao);
+                    companiesPromo.sort((a, b) => double.parse(b.descontoGofood == 'null' ? '0' : b.descontoGofood)
+                        .compareTo(double.parse(a.descontoGofood == 'null' ? '0' : a.descontoGofood)));
 
                     return companiesPromo.length == 0
                         ? Container()

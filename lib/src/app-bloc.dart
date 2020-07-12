@@ -1,5 +1,6 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_food_br/src/blocs/item-bloc.dart';
 import 'package:go_food_br/src/model/banner.dart';
 import 'package:go_food_br/src/model/company-model.dart';
 import 'package:go_food_br/src/model/cupom.dart';
@@ -26,7 +27,7 @@ class AppBloc extends BlocBase {
   bool convidado = false;
   double cashback = 0;
   double troco = 0;
-
+  final itemBloc = BlocProvider.getBloc<ItemBloc>();
   bool addCashback(double value) {
     if (value <= double.parse(userModel.saldoCashBack)) {
       cashback = value;
@@ -36,12 +37,12 @@ class AppBloc extends BlocBase {
     }
   }
 
-  bool addTroco(double value) {
+  void addTroco(double value) {
     troco = value;
   }
 
   void clearCarrinho() {
-    _carrinhoController.sink.add([]);
+     _carrinhoController.sink.add([]);
     troco = 0;
     cashback = 0;
     _paymentController.sink.add(null);
@@ -155,7 +156,6 @@ class AppBloc extends BlocBase {
           loadIn(5);
           return;
         }
-
         getCategories(this);
         getBanner(this);
         loadIn(2);
@@ -228,7 +228,6 @@ class AppBloc extends BlocBase {
   void addProductCarrinho(Product product) {
     List<Product> produtos = [];
     produtos.addAll(_carrinhoController.value);
-
     produtos.add(product);
     _carrinhoController.sink.add(produtos);
   }

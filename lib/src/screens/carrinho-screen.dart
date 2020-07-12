@@ -25,7 +25,7 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
 
   @override
   void initState() {
-    super.initState(); 
+    super.initState();
   }
 
   int paymentSelect = 0;
@@ -429,7 +429,13 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                         width: ScreenUtil().setWidth(20),
                                       ),
                                       Text(
-                                        (appBloc.getPayment() != null && appBloc.getPayment().formaPagamentoDeliveryId == 14) ? "0,00" : "${formatPrice(double.parse(appBloc.getCarrinho()[0].company.valorFrete))}",
+                                        (appBloc.getPayment() != null &&
+                                                appBloc
+                                                        .getPayment()
+                                                        .formaPagamentoDeliveryId ==
+                                                    14)
+                                            ? "0,00"
+                                            : "${formatPrice(double.parse(appBloc.getCarrinho()[0].company.valorFrete))}",
                                         style: TextStyle(
                                             color: Colors.black54,
                                             fontSize: ScreenUtil().setSp(30)),
@@ -463,9 +469,6 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                               itemCount: appBloc.getCarrinho().length,
                               itemBuilder: (context, index) {
                                 Product product = appBloc.getCarrinho()[index];
-                                int quantidade = 0;
-
-                                quantidade += product.quantidade;
 
                                 double valor = getValorProduto(product);
 
@@ -474,14 +477,14 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                 for (Complemento complemento
                                     in product.complementos) {
                                   listaComplementos.add(Text(
-                                    "1x ${complemento.produtoComplemento.descricaoProduto}",
+                                    "${complemento.quantidade}x ${complemento.produtoComplemento.descricaoProduto}",
                                     style: TextStyle(color: Colors.grey),
                                   ));
                                 }
 
                                 for (Opcional opcional in product.opcionais) {
                                   listaComplementos.add(Text(
-                                    "1x ${opcional.descricao}",
+                                    "${opcional.quantidade}x ${opcional.descricao}",
                                     style: TextStyle(color: Colors.grey),
                                   ));
                                 }
@@ -648,7 +651,11 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                           ),
                                         ),
                                         Text(
-                                          (appBloc.getPayment() != null && appBloc.getPayment().formaPagamentoDeliveryId == 14)
+                                          (appBloc.getPayment() != null &&
+                                                  appBloc
+                                                          .getPayment()
+                                                          .formaPagamentoDeliveryId ==
+                                                      14)
                                               ? "0,00"
                                               : formatPrice(double.parse(appBloc
                                                   .getCarrinho()[0]
@@ -778,7 +785,12 @@ class _CarrinhoScreenState extends State<CarrinhoScreen> {
                                                         .company
                                                         .descontoGofood) /
                                                 100,
-                                            frete: (appBloc.getPayment() != null && appBloc.getPayment().formaPagamentoDeliveryId == 14)
+                                            frete: (appBloc.getPayment() !=
+                                                        null &&
+                                                    appBloc
+                                                            .getPayment()
+                                                            .formaPagamentoDeliveryId ==
+                                                        14)
                                                 ? 0
                                                 : double.parse(appBloc
                                                     .getCarrinho()[0]

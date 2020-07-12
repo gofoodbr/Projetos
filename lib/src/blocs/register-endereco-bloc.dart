@@ -5,8 +5,8 @@ import 'package:go_food_br/src/services/geolocation-service.dart';
 import 'package:go_food_br/src/services/register-service.dart';
 import 'package:rxdart/rxdart.dart';
 
-class RegisterEnderecoBloc extends BlocBase{
-
+class RegisterEnderecoBloc extends BlocBase
+{
   Future<EnderecoModel> getEndereco(String lat, String lng)async{
     loadIn(1);
     EnderecoModel enderecoModel = await getEnderecoService(

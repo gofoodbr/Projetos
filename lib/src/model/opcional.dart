@@ -1,6 +1,7 @@
 class Opcional {
   int composicaoProdutoId;
   String descricao;
+  int quantidade;
   String produto;
   int produtoId;
   int categoriaOpcionalProdutoId;
@@ -16,7 +17,8 @@ class Opcional {
         this.produtoId,
         this.valorTotal,
         this.categoria,
-        this.categoriaOpcionalProdutoId
+        this.categoriaOpcionalProdutoId,
+        this.quantidade = 1
       });
 
   Opcional.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class Opcional {
     produto = json['Produto'];
     valorTotal = json['ValorTotal'].toString() == 'null' ? '0' : json['ValorTotal'].toString();
     produtoId = json['ProdutoId'];
+    quantidade = json['Quantidade'];
     categoriaOpcionalProdutoId = json['CategoriaOpcionalProdutoId'];
     categoria = json['CategoriaOpcionalProduto'] != null
         ? new CategoriaOpcional.fromJson(json['CategoriaOpcionalProduto'])
@@ -38,6 +41,7 @@ class Opcional {
     data['Produto'] = this.produto;
     data['ValorTotal'] = this.valorTotal;
     data['ProdutoId'] = this.produtoId;
+    data['Quantidade'] = this.quantidade;
     data['CategoriaOpcionalProdutoId'] = this.categoriaOpcionalProdutoId;
     return data;
   }

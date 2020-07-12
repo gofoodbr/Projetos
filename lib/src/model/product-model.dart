@@ -196,21 +196,32 @@ class Product {
     if (data["ComplementoPedidoItens"].length > 0) {
       double valorAdicional = 0;
       for (Complemento c in complementos) {
-        valorAdicional += double.parse(c.produtoComplemento.precoVenda);
+        valorAdicional += double.parse(c.produtoComplemento.precoVenda) * c.quantidade;
       }
       data["ValorAcrescimo"] = valorAdicional * quantidade;
     }
+
+     if (data["ComposicaoPedidoItens"].length > 0) {
+      double valorOpcional = 0;
+      for (Opcional c in opcionais) {
+        valorOpcional += double.parse(c.valorTotal) * c.quantidade;
+      }
+      data["ValorAcrescimo"] = valorOpcional * quantidade;
+    }
+
+
     data["ValorSubTotal"] =
         (quantidade * data["ValorUnitario"]) + data["ValorAcrescimo"];
     data["ValorTotal"] = data["ValorSubTotal"];
     return data;
   }
 
-  List<Map<String, dynamic>> getSabores() {
+  List<Map<String, dynamic>> getSabores() 
+  {
     List<Map<String, dynamic>> data = [];
     for (Sabor sabor in this.sabores) {
       data.add({
-        "SaborPedidoItemId": sabor.saborProdutoId,
+        "SaborPedidoItemId": 0,
         "Descricao": sabor.descricao,
       });
     }
@@ -221,8 +232,9 @@ class Product {
     List<Map<String, dynamic>> data = [];
     for (Opcional opcional in this.opcionais) {
       data.add({
-        "ComposicaoPedidoItemId": opcional.composicaoProdutoId,
+        "ComposicaoPedidoItemId": 0,
         "Descricao": opcional.descricao,
+        "Quantidade": opcional.quantidade,
       });
     }
     return data;
@@ -232,9 +244,9 @@ class Product {
     List<Map<String, dynamic>> data = [];
     for (Complemento complemento in this.complementos) {
       data.add({
-        "ComplementoPedidoItemId": complemento.complementoProdutoId,
+        "ComplementoPedidoItemId": 0,
         "Descricao": complemento.produtoComplemento.descricaoProduto,
-        "Quantidade": 1,
+        "Quantidade": complemento.quantidade,
         "ProdutoComplementoId": complemento.produtoComplementoId
       });
     }

@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:go_food_br/src/model/complemento-model.dart';
+import 'package:go_food_br/src/model/opcional.dart';
+import 'package:go_food_br/src/model/sabor.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bloc_pattern/bloc_pattern.dart';
 import '../components/show-error.dart';
@@ -569,15 +572,28 @@ class _HistoricoPedidoState extends State<HistoricoPedido> {
       itemCount: pedido.pedidoItens.length,
       itemBuilder: (context, index) {
         PedidoItens item = pedido.pedidoItens[index];
-        List<String> complementos = [];
-        for (var a in item.composicaoPedidoItens) {
-          complementos.add(a.descricao);
+        List<Complemento> complementos = [];
+        List<Sabor> sabores = [];
+        List<Opcional> opcionais = [];
+        for (var c in item.complementoPedidoItens) {
+          ProdutoComplemento produto =
+              ProdutoComplemento(descricaoProduto: c.produto.nomeAbreviado);
+          Complemento complemento = Complemento(
+              quantidade: c.quantidade != null ? int.parse(c.quantidade) : 1,
+              produtoComplemento: produto);
+          complementos.add(complemento);
         }
-        for (var a in item.saborPedidoItens) {
-          complementos.add(a.descricao);
+
+        for (var s in item.saborPedidoItens) {
+          Sabor sabor = Sabor(descricao: s.descricao);
+          sabores.add(sabor);
         }
-        for (var a in item.complementoPedidoItens) {
-          complementos.add(a.produto.nomeAbreviado);
+
+        for (var o in item.composicaoPedidoItens) {
+          Opcional opcional = Opcional(
+              descricao: o.descricao,
+              quantidade: o.quantidade != null ? int.parse(o.quantidade) : 1);
+          opcionais.add(opcional);
         }
         return Column(
           children: <Widget>[
@@ -600,6 +616,7 @@ class _HistoricoPedidoState extends State<HistoricoPedido> {
                   item.produto.nomeAbreviado,
                   style: TextStyle(
                     color: Colors.black,
+                    fontWeight: FontWeight.bold,
                     fontSize: ScreenUtil().setSp(32),
                   ),
                 ),
@@ -615,22 +632,89 @@ class _HistoricoPedidoState extends State<HistoricoPedido> {
                 ),
               ],
             ),
-            ListView.builder(
-              itemCount: complementos.length,
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return Text(
-                  complementos[index],
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: ScreenUtil().setSp(32),
-                  ),
-                );
-              },
-            ),
+            sabores.length == 0
+                ? Container()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                        Text(
+                          'Sabores',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: ScreenUtil().setSp(32)),
+                        ),
+                        ListView.builder(
+                          itemCount: sabores.length,
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return Text(
+                              "${sabores[index].descricao}",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: ScreenUtil().setSp(32),
+                              ),
+                            );
+                          },
+                        )
+                      ]),
+            complementos.length == 0
+                ? Container()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                        Text(
+                          'Adicionais',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: ScreenUtil().setSp(32)),
+                        ),
+                        ListView.builder(
+                          itemCount: complementos.length,
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return Text(
+                              "${complementos[index].quantidade}x ${complementos[index].produtoComplemento.descricaoProduto}",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: ScreenUtil().setSp(32),
+                              ),
+                            );
+                          },
+                        )
+                      ]),
+            opcionais.length == 0
+                ? Container()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                        Text(
+                          'Opcionais',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: ScreenUtil().setSp(32)),
+                        ),
+                        ListView.builder(
+                          itemCount: opcionais.length,
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return Text(
+                              "${opcionais[index].quantidade}x ${opcionais[index].descricao}",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: ScreenUtil().setSp(32),
+                              ),
+                            );
+                          },
+                        )
+                      ]),
             SizedBox(
               height: ScreenUtil().setHeight(10),
+            ),
+            Divider(
+              color: Colors.grey.withOpacity(0.5),
             ),
           ],
         );

@@ -19,7 +19,7 @@ Future<bool> getGruposCompany({
               validateStatus: (status) {
                 return status < 500;
               })
-    ).timeout(Duration(seconds: 20)).catchError((e) {
+    ).timeout(Duration(seconds: 60)).catchError((e) {
       throw e;
     });
     if (response.statusCode == 200) {
@@ -45,7 +45,6 @@ Future<List<Product>> getProductsCompany({
   CompanyScreenBloc bloc,
 }) async {
   Dio dio = Dio();
-
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/obter-produtos?empresaId=${company.empresaId}",

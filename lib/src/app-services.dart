@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_food_br/src/app-bloc.dart';
 import 'package:go_food_br/src/app-settings.dart';
@@ -73,7 +72,7 @@ Future<FirebaseUser> loadCurrentUser() async {
 
 Future<bool> checkInternetAccess() async {
   Dio dio = Dio();
-  String url = "http://httpbin.org/ip";
+  String url = "https://www.google.com";
   try {
     Response response =
         await dio.get(url).timeout(Duration(seconds: 30)).catchError((e) {

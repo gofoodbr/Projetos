@@ -1,6 +1,7 @@
 class Complemento {
   int complementoProdutoId;
   int produtoId;
+  int quantidade;
   ProdutoComplemento produtoComplemento;
   int produtoComplementoId;
   bool obrigatorio;
@@ -10,11 +11,13 @@ class Complemento {
       this.produtoId,
       this.produtoComplemento,
       this.produtoComplementoId,
-      this.obrigatorio});
+      this.obrigatorio,
+      this.quantidade = 1});
 
   Complemento.fromJson(Map<String, dynamic> json) {
     complementoProdutoId = json['ComplementoProdutoId'];
     produtoId = json['ProdutoId'];
+    quantidade = json['Quantidade'];
     produtoComplemento = json['ProdutoComplemento'] != null
         ? new ProdutoComplemento.fromJson(json['ProdutoComplemento'])
         : null;
@@ -31,6 +34,7 @@ class Complemento {
     }
     data['ProdutoComplementoId'] = this.produtoComplementoId;
     data['Obrigatorio'] = this.obrigatorio;
+    data['Quantidade'] = this.quantidade;
     return data;
   }
 }
