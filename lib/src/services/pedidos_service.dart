@@ -1,10 +1,27 @@
+import 'dart:io';
+
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:go_food_br/src/model/pedido.dart';
 
 import '../app-settings.dart';
 
+Dio getDioHttp()
+{
+  var dio = Dio();
+  if (Platform.isAndroid) {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
+  }
+  return dio;
+}
+
 Future<List<Pedido>> getPedidosService({String userId}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   print(userId);
   try {
     Response response = await dio.get(
@@ -32,7 +49,7 @@ Future<List<Pedido>> getPedidosService({String userId}) async {
 }
 
 Future<Pedido> getPedidoService({String id}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   try {
     Response response =
         await dio.get("$urlApi/Pedido/detalhe-pedido?pedidoId=$id",
@@ -55,7 +72,7 @@ Future<Pedido> getPedidoService({String id}) async {
 }
 
 Future<List<HistoricoStatusPedidos>> getHistoricoService({String id}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   try {
     Response response =
         await dio.get("$urlApi/Pedido/status-pedido?pedidoId=$id",
@@ -80,7 +97,7 @@ Future<List<HistoricoStatusPedidos>> getHistoricoService({String id}) async {
 }
 
 Future<bool> setExcluirPedido({String id}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   try {
     Response response =
         await dio.put("$urlApi/Pedido/cancelar-pedido-cliente?pedidoId=$id",
@@ -103,7 +120,7 @@ Future<bool> setExcluirPedido({String id}) async {
 }
 
 Future<bool> receberPedidoService({String id}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   try {
     Response response = await dio.put(
         "$urlApi/Pedido/confirmar-recebimento-pedido?pedidoId=$id",
@@ -126,7 +143,7 @@ Future<bool> receberPedidoService({String id}) async {
 }
 
 Future<bool> avaliarPedidoService({String id, int stars, String desc}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   print({
     "Descricao": "$desc",

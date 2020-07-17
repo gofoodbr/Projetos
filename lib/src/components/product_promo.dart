@@ -18,7 +18,7 @@ class ProductsPromo extends StatelessWidget {
     return Container(
       color: Colors.white,
       margin: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
-      height: ScreenUtil().setHeight(320),
+      height: ScreenUtil().setHeight(370),
       padding: EdgeInsets.only(
           top: ScreenUtil().setHeight(30), left: ScreenUtil().setWidth(10)),
       child: Column(
@@ -66,7 +66,7 @@ Widget cardPromo(Product product, BuildContext context, AppBloc appBloc) {
           padding: const EdgeInsets.all(5),
           child: Stack(children: <Widget>[
             Container(
-              width: 300,
+              width: 320,
               padding:
                   EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(20)),
               decoration: BoxDecoration(
@@ -113,7 +113,7 @@ Widget cardPromo(Product product, BuildContext context, AppBloc appBloc) {
                                       "A partir de ${formatPrice(double.parse(product.precoVenda))}",
                                       style: GoogleFonts.poppins(
                                           fontWeight: FontWeight.w500,
-                                          fontSize: ScreenUtil().setSp(28)),
+                                          fontSize: ScreenUtil().setSp(26)),
                                     )
                                   : RichText(
                                       text: TextSpan(children: [
@@ -122,7 +122,7 @@ Widget cardPromo(Product product, BuildContext context, AppBloc appBloc) {
                                               "${formatPrice(double.parse(product.precoVendaPromocional))}  ",
                                           style: GoogleFonts.poppins(
                                               fontWeight: FontWeight.w500,
-                                              fontSize: ScreenUtil().setSp(29),
+                                              fontSize: ScreenUtil().setSp(26),
                                               color: Colors.green),
                                         ),
                                         TextSpan(
@@ -138,7 +138,7 @@ Widget cardPromo(Product product, BuildContext context, AppBloc appBloc) {
                                       ]),
                                     ),
                               SizedBox(
-                                height: ScreenUtil().setHeight(50),
+                                height: ScreenUtil().setHeight(20),
                               ),
                             ],
                           ),
@@ -147,16 +147,12 @@ Widget cardPromo(Product product, BuildContext context, AppBloc appBloc) {
                             ? Container()
                             : Image(
                                 image: image.image,
-                                width: ScreenUtil().setWidth(180),
+                                width: ScreenUtil().setWidth(130),
                                 height: ScreenUtil().setHeight(130),
-                                fit: BoxFit.fill,
+                                fit: BoxFit.scaleDown,
                               ),
                       ],
                     ),
-                  ),
-                  Container(
-                    height: 1,
-                    color: Colors.grey.shade300,
                   )
                 ],
               ),

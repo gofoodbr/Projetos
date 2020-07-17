@@ -35,13 +35,13 @@ class CardImage extends StatelessWidget {
                     ? Image(image : AdvancedNetworkImage(
                           image,
                           useDiskCache: true,
-                          cacheRule: CacheRule(maxAge: const Duration(days: 1)),
+                          cacheRule: CacheRule(maxAge: const Duration(days: 1))
                         ),
                         width: ScreenUtil().setWidth(450))
                     : Image(image : AdvancedNetworkImage(
                           image,
                           useDiskCache: true,
-                          cacheRule: CacheRule(maxAge: const Duration(days: 1)),
+                          cacheRule: CacheRule(maxAge: const Duration(days: 1))
                         ), width: ScreenUtil().setWidth(170)),
               ),
             ),

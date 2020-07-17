@@ -1,6 +1,23 @@
+import 'dart:io';
+
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_food_br/src/app-settings.dart';
+
+Dio getDioHttp()
+{
+  var dio = Dio();
+  if (Platform.isAndroid) {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
+  }
+  return dio;
+}
 
 Future<bool> registerUserService({
    FirebaseUser firebaseUser,
@@ -9,7 +26,7 @@ Future<bool> registerUserService({
     String sexo,
     String code
 }) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio.post(
@@ -59,7 +76,7 @@ Future<bool> registerEnderecoService({
   String lat,
   String lng
 }) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio.post(

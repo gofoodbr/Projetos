@@ -1,13 +1,28 @@
+import 'dart:io';
+
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:go_food_br/src/model/FormaPagamentoDelivery.dart';
 import 'package:go_food_br/src/model/cartao_cliente.dart';
 import '../app-bloc.dart';
 import '../app-settings.dart';
 
-
+Dio getDioHttp()
+{
+  var dio = Dio();
+  if (Platform.isAndroid) {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
+  }
+  return dio;
+}
 
 Future<bool> getPaymentsOnlineService(AppBloc appBloc, int empresaId) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio.get(
@@ -40,7 +55,7 @@ Future<bool> getPaymentsOnlineService(AppBloc appBloc, int empresaId) async {
 }
 
 Future<bool> getCardsService(AppBloc appBloc, int clienteId) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio.get(
@@ -83,7 +98,7 @@ Future<bool> registerCardService({
   String mes,
   String cvv
 }) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   try {
     Response response = await dio.post(
         "$urlApi/Pedido/registrar-cartao-cliente",

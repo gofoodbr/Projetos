@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_food_br/src/app-bloc.dart';
@@ -14,6 +17,20 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'model/FormaPagamentoDelivery.dart';
 import 'model/product-model.dart';
+
+Dio getDioHttp()
+{
+  var dio = Dio();
+  if (Platform.isAndroid) {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
+  }
+  return dio;
+}
 
 Future<FirebaseUser> signInWithGoogle() async {
   try {
@@ -90,7 +107,7 @@ Future<bool> checkInternetAccess() async {
 }
 
 Future<bool> getCategories(AppBloc appBloc) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
    try {
     Response response = await dio
         .get("$urlApi/Pedido/obter-categorias",
@@ -122,7 +139,7 @@ Future<bool> getCategories(AppBloc appBloc) async {
 }
 
 Future<bool> getBanner(AppBloc appBloc) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   try {
     Response response = await dio
         .get("$urlApi/Pedido/obter-banners",
@@ -154,7 +171,7 @@ Future<bool> getBanner(AppBloc appBloc) async {
 }
 
 Future<bool> getUser(AppBloc appBloc, {String credential}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio
@@ -183,7 +200,7 @@ Future<bool> getUser(AppBloc appBloc, {String credential}) async {
 }
 
 Future<bool> getEnderecosService(AppBloc appBloc) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   print(appBloc.userModel.clienteId);
   try {
     Response response = await dio
@@ -222,7 +239,7 @@ Future<bool> getEnderecosService(AppBloc appBloc) async {
 
 Future<bool> getCompaniesService(AppBloc appBloc,
     {String lat, String lng}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio.post("$urlApi/Pedido/obter-lojas",
@@ -252,7 +269,7 @@ Future<bool> getCompaniesService(AppBloc appBloc,
 }
 
 Future<bool> getPaymentsService(AppBloc appBloc, int empresaId) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio
@@ -286,7 +303,7 @@ Future<bool> getPaymentsService(AppBloc appBloc, int empresaId) async {
 }
 
 Future<bool> deleteEnderecoService(AppBloc appBloc, int enderecoId) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio
@@ -317,7 +334,7 @@ Future<bool> deleteEnderecoService(AppBloc appBloc, int enderecoId) async {
 }
 
 Future<bool> cupomRequestService(AppBloc appBloc, String value) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio
@@ -356,7 +373,7 @@ Future<bool> setPedidoService(AppBloc appBloc,
     EnderecoModel enderecoModel,
     double valorPago,
     double cashBack}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   List<Map<String, dynamic>> listProductsCarrinho = [];
   double valorAcrescimo = 0;

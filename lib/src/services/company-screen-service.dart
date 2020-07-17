@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:go_food_br/src/blocs/company-screen-bloc.dart';
 import 'package:go_food_br/src/model/company-model.dart';
@@ -6,11 +9,25 @@ import 'package:go_food_br/src/model/product-model.dart';
 
 import '../app-settings.dart';
 
+Dio getDioHttp()
+{
+  var dio = Dio();
+  if (Platform.isAndroid) {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
+  }
+  return dio;
+}
+
 Future<bool> getGruposCompany({
   Company company,
   CompanyScreenBloc bloc
 }) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/obter-grupos?empresaId=${company.empresaId}",
@@ -44,7 +61,7 @@ Future<List<Product>> getProductsCompany({
   Company company,
   CompanyScreenBloc bloc,
 }) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/obter-produtos?empresaId=${company.empresaId}",
