@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:go_food_br/src/blocs/filter-bloc.dart';
-import 'package:go_food_br/src/components/card_image.dart';
 import 'package:go_food_br/src/components/tile-filter.dart';
 import 'package:go_food_br/src/model/categories.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -190,7 +189,6 @@ class _KmFilterState extends State<KmFilter> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     kmFilter = widget.value;
   }

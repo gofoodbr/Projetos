@@ -1,21 +1,40 @@
+import 'dart:io';
+
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:go_food_br/src/model/pedido.dart';
 
 import '../app-settings.dart';
 
-Future<List<Pedido>> getPedidosService({
-  String userId
-}) async {
-  Dio dio = Dio();
+Dio getDioHttp()
+{
+  var dio = Dio();
+  if (Platform.isAndroid) {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
+  }
+  return dio;
+}
+
+Future<List<Pedido>> getPedidosService({String userId}) async {
+  Dio dio = getDioHttp();
   print(userId);
   try {
     Response response = await dio.get(
         "$urlApi/Pedido/obter-pedido-cliente?ClienteDeliveryId=$userId",
-    );
+        options: Options(
+            followRedirects: false,
+            validateStatus: (status) {
+              return status < 500;
+            }));
     if (response.statusCode == 200) {
       print(response.data);
       List<Pedido> listPedidos = [];
-      for(var a in response.data){
+      for (var a in response.data) {
         listPedidos.add(Pedido.fromJson(a));
       }
       return listPedidos;
@@ -29,14 +48,16 @@ Future<List<Pedido>> getPedidosService({
   }
 }
 
-Future<Pedido> getPedidoService({
-  String id
-}) async {
-  Dio dio = Dio();
+Future<Pedido> getPedidoService({String id}) async {
+  Dio dio = getDioHttp();
   try {
-    Response response = await dio.get(
-        "$urlApi/Pedido/detalhe-pedido?pedidoId=$id",
-    );
+    Response response =
+        await dio.get("$urlApi/Pedido/detalhe-pedido?pedidoId=$id",
+            options: Options(
+                followRedirects: false,
+                validateStatus: (status) {
+                  return status < 500;
+                }));
     if (response.statusCode == 200) {
       print(response.data);
       return Pedido.fromJson(response.data);
@@ -50,17 +71,21 @@ Future<Pedido> getPedidoService({
   }
 }
 
-Future<List<HistoricoStatusPedidos>> getHistoricoService({
-  String id
-}) async {
-  Dio dio = Dio();
+Future<List<HistoricoStatusPedidos>> getHistoricoService({String id}) async {
+  Dio dio = getDioHttp();
   try {
-    Response response = await dio.get(
-        "$urlApi/Pedido/status-pedido?pedidoId=$id",
-    );
+    Response response =
+        await dio.get("$urlApi/Pedido/status-pedido?pedidoId=$id",
+            options: Options(
+                followRedirects: false,
+                validateStatus: (status) {
+                  return status < 500;
+                }));
     if (response.statusCode == 200) {
       print(response.data);
-      return (response.data as List).map((item) => HistoricoStatusPedidos.fromJson(item)).toList();
+      return (response.data as List)
+          .map((item) => HistoricoStatusPedidos.fromJson(item))
+          .toList();
     } else {
       print(response.data);
       return null;
@@ -71,14 +96,16 @@ Future<List<HistoricoStatusPedidos>> getHistoricoService({
   }
 }
 
-Future<bool> setExcluirPedido({
-  String id
-}) async {
-  Dio dio = Dio();
+Future<bool> setExcluirPedido({String id}) async {
+  Dio dio = getDioHttp();
   try {
-    Response response = await dio.put(
-        "$urlApi/Pedido/cancelar-pedido-cliente?pedidoId=$id",
-    );
+    Response response =
+        await dio.put("$urlApi/Pedido/cancelar-pedido-cliente?pedidoId=$id",
+            options: Options(
+                followRedirects: false,
+                validateStatus: (status) {
+                  return status < 500;
+                }));
     if (response.statusCode == 200) {
       print(response.data);
       return true;
@@ -92,14 +119,16 @@ Future<bool> setExcluirPedido({
   }
 }
 
-Future<bool> receberPedidoService({
-  String id
-}) async {
-  Dio dio = Dio();
+Future<bool> receberPedidoService({String id}) async {
+  Dio dio = getDioHttp();
   try {
     Response response = await dio.put(
         "$urlApi/Pedido/confirmar-recebimento-pedido?pedidoId=$id",
-    );
+        options: Options(
+            followRedirects: false,
+            validateStatus: (status) {
+              return status < 500;
+            }));
     if (response.statusCode == 200) {
       print(response.data);
       return true;
@@ -113,12 +142,8 @@ Future<bool> receberPedidoService({
   }
 }
 
-Future<bool>   avaliarPedidoService({
-  String id,
-  int stars,
-  String desc
-}) async {
-  Dio dio = Dio();
+Future<bool> avaliarPedidoService({String id, int stars, String desc}) async {
+  Dio dio = getDioHttp();
 
   print({
     "Descricao": "$desc",
@@ -127,15 +152,18 @@ Future<bool>   avaliarPedidoService({
     "DataAvalicacao": DateTime.now().toIso8601String()
   });
   try {
-    Response response = await dio.post(
-        "$urlApi/Pedido/salvar-comentario",
+    Response response = await dio.post("$urlApi/Pedido/salvar-comentario",
+        options: Options(
+            followRedirects: false,
+            validateStatus: (status) {
+              return status < 500;
+            }),
         data: {
-          "Descricao": "comentario",
-          "Avaliação": stars,
+          "Descricao": desc,
+          "Avaliacao": stars,
           "PedidoId": id,
           "DataAvalicacao": DateTime.now().toIso8601String()
-        }
-    );
+        });
     if (response.statusCode == 200) {
       print(response.data);
       return true;

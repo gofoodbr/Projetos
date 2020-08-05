@@ -21,6 +21,7 @@ import 'package:go_food_br/src/screens/payments_screen.dart';
 import 'package:go_food_br/src/screens/pedidos_screen.dart';
 import 'package:go_food_br/src/screens/product-screen.dart';
 import 'package:go_food_br/src/screens/profile-screen.dart';
+import 'package:go_food_br/src/screens/register-card-screen.dart';
 import 'package:go_food_br/src/screens/register-endereco-screen.dart';
 import 'package:go_food_br/src/screens/register-screen.dart';
 import 'package:go_food_br/src/screens/splash-screen.dart';
@@ -42,7 +43,8 @@ class MyApp extends StatelessWidget {
         Bloc((i) => CompanyScreenBloc()),
         Bloc((i) => ItemBloc()),
         Bloc((i)=> PedidosBloc()),
-        Bloc((i)=> HistoricoBloc())
+        Bloc((i)=> HistoricoBloc()),
+        Bloc((i)=> RegisterCardScreen())
       ],
       child: MaterialApp(
         color: Colors.blue,
@@ -68,7 +70,8 @@ class MyApp extends StatelessWidget {
           "/cashback_screen": (context) => CashBackScreen(),
           "/troco_screen": (context) => TrocoScreen(),
           "/pedidos_screen": (context)=> PedidosScreen(),
-          "/historico_pedido": (context) => HistoricoPedido()
+          "/historico_pedido": (context) => HistoricoPedido(),
+          "/register_card_screen": (context) => RegisterCardScreen()
         },
       ),
     );

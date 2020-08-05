@@ -96,7 +96,6 @@ class FilterBloc extends BlocBase{
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _filterController.close();
     _companiesController.close();

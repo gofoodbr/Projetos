@@ -1,3 +1,5 @@
+import 'FormaPagamentoDelivery.dart';
+
 class Payment {
   int formaPagamentoLojistaId;
   int empresaId;
@@ -35,25 +37,3 @@ class Payment {
   }
 }
 
-class FormaPagamentoDelivery {
-  int formaPagamentoDeliveryId;
-  String nome;
-  String imagemUrl;
-
-  FormaPagamentoDelivery(
-      {this.formaPagamentoDeliveryId, this.nome, this.imagemUrl});
-
-  FormaPagamentoDelivery.fromJson(Map<String, dynamic> json) {
-    formaPagamentoDeliveryId = json['FormaPagamentoDeliveryId'];
-    nome = json['Nome'];
-    imagemUrl = json['ImagemUrl'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['FormaPagamentoDeliveryId'] = this.formaPagamentoDeliveryId;
-    data['Nome'] = this.nome;
-    data['ImagemUrl'] = this.imagemUrl;
-    return data;
-  }
-}

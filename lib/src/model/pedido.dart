@@ -1,3 +1,5 @@
+import 'FormaPagamentoDelivery.dart';
+
 class Pedido {
   int pedidoId;
   int empresaId;
@@ -37,10 +39,11 @@ class Pedido {
   int statusPedidoId;
   List<PedidoItens> pedidoItens;
   List<HistoricoStatusPedidos> historicoStatusPedidos;
-
   String empresaNome;
   String content;
   String contentType;
+  bool pagamentoOnline;
+  int cartaoClienteDeliveryId;
 
   Pedido(
       {this.pedidoId,
@@ -83,7 +86,9 @@ class Pedido {
       this.valorTotal,
       this.statusPedidoId,
       this.pedidoItens,
-      this.historicoStatusPedidos});
+      this.historicoStatusPedidos,
+      this.pagamentoOnline,
+      this.cartaoClienteDeliveryId});
 
   Pedido.fromJson(Map<String, dynamic> json) {
     pedidoId = json['PedidoId'];
@@ -128,6 +133,8 @@ class Pedido {
     content = json["Content"];
     contentType = json["ContentType"];
     statusPedidoId = json['StatusPedidoId'];
+    pagamentoOnline = json['PagamentoOnline'];
+    cartaoClienteDeliveryId = json['CartaoClienteDeliveryId'];
     if (json['PedidoItens'] != null) {
       pedidoItens = new List<PedidoItens>();
       json['PedidoItens'].forEach((v) {
@@ -182,6 +189,8 @@ class Pedido {
     data['SubTotal'] = this.subTotal;
     data['ValorTotal'] = this.valorTotal;
     data['StatusPedidoId'] = this.statusPedidoId;
+    data['PagamentoOnline'] = this.pagamentoOnline;
+    data['CartaoClienteDeliveryId'] = this.cartaoClienteDeliveryId;
     if (this.pedidoItens != null) {
       data['PedidoItens'] = this.pedidoItens.map((v) => v.toJson()).toList();
     }
@@ -248,29 +257,6 @@ class Empresa {
     data['Numero'] = this.numero;
     data['Telefone'] = this.telefone;
     data['Email'] = this.email;
-    return data;
-  }
-}
-
-class FormaPagamentoDelivery {
-  int formaPagamentoDeliveryId;
-  String nome;
-  String imagemUrl;
-
-  FormaPagamentoDelivery(
-      {this.formaPagamentoDeliveryId, this.nome, this.imagemUrl});
-
-  FormaPagamentoDelivery.fromJson(Map<String, dynamic> json) {
-    formaPagamentoDeliveryId = json['FormaPagamentoDeliveryId'];
-    nome = json['Nome'];
-    imagemUrl = json['ImagemUrl'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['FormaPagamentoDeliveryId'] = this.formaPagamentoDeliveryId;
-    data['Nome'] = this.nome;
-    data['ImagemUrl'] = this.imagemUrl;
     return data;
   }
 }
@@ -521,7 +507,7 @@ class ComposicaoPedidoItens {
   ComposicaoPedidoItens.fromJson(Map<String, dynamic> json) {
     composicaoPedidoItemId = json['ComposicaoPedidoItemId'];
     descricao = json['Descricao'];
-    quantidade = json['Quantidade'];
+    quantidade = json['Quantidade'].toString();
     pedidoItemId = json['PedidoItemId'];
   }
 

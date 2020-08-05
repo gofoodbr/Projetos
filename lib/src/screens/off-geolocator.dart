@@ -1,9 +1,11 @@
-import 'dart:async';
 import 'dart:io';
+import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
 import 'package:go_food_br/src/app-settings.dart';
+import 'package:go_food_br/src/services/geolocation-service.dart';
+import 'package:location/location.dart';
 
-import '../app-services.dart';
+import '../app-bloc.dart';
 
 class OffGeolocatoPage extends StatefulWidget {
   @override
@@ -12,9 +14,9 @@ class OffGeolocatoPage extends StatefulWidget {
 
 class _OffGeolocatoPageState extends State<OffGeolocatoPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  final appBloc = BlocProvider.getBloc<AppBloc>();
   bool isProcessing;
-
+  LocationData location;
   @override
   void initState() {
     isProcessing = false;
@@ -59,66 +61,47 @@ class _OffGeolocatoPageState extends State<OffGeolocatoPage> {
             Container(
                 child: !isProcessing
                     ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    RaisedButton(
-                      onPressed: () => exit(0),
-                      child: Text(
-                        "Sair",
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                      color: Colors.white,
-                    ),
-                    RaisedButton(
-                      color: primaryColor,
-                      onPressed: (){
-                        Navigator.pushReplacementNamed(context, "/");
-                      },
-                      child: Text(
-                        "Tentar Novamente",
-                        style: TextStyle(fontSize: 16.0, color: Colors.white),
-                      ),
-                    ),
-                  ],
-                )
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          RaisedButton(
+                            onPressed: () => exit(0),
+                            child: Text(
+                              "Sair",
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                            color: Colors.white,
+                          ),
+                          RaisedButton(
+                            color: primaryColor,
+                            onPressed: () {
+                              getLocation(1, timeOut: 30, appBloc: appBloc)
+                                  .then((value) {
+                                if (appBloc.location != null) {
+                                 Navigator.pop(context);
+                                }
+                              });
+                              
+                            },
+                            child: Text(
+                              "Tentar Novamente",
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      )
                     : null),
             Container(
-              child: isProcessing ? CircularProgressIndicator(
-                valueColor: new AlwaysStoppedAnimation<Color>(primaryColor),
-              ) : null,
+              child: isProcessing
+                  ? CircularProgressIndicator(
+                      valueColor:
+                          new AlwaysStoppedAnimation<Color>(primaryColor),
+                    )
+                  : null,
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<Null> _verificaAcessoIntenet() async {
-    setState(() {
-      isProcessing = true;
-    });
-    var intenet = await checkInternetAccess();
-    if (intenet) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text("Sucesso ao conectar na internet!"),
-        backgroundColor: primaryColor,
-        duration: Duration(seconds: 2),
-      ));
-      Future.delayed(Duration(seconds: 1)).then((_) {
-        Navigator.pushReplacementNamed(
-            context, "/"
-        );
-      });
-    } else {
-      setState(() {
-        isProcessing = false;
-      });
-      print('not connected');
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text("Falha ao conectar na internet!"),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 2),
-      ));
-    }
   }
 }

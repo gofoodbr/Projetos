@@ -9,26 +9,38 @@ import 'package:rxdart/rxdart.dart';
 
 class ItemBloc extends BlocBase {
   final _qntSaboresController = BehaviorSubject<int>.seeded(0);
-  Function(int) get qntSaboresIn => _qntSaboresController.sink.add;
+  Function(int) get qntSaboresIn => _qntSaboresController.add;
   Stream<int> get qntSaboresOut => _qntSaboresController.stream;
 
   final _productsController = BehaviorSubject<Product>();
-  Function(Product) get productsIn => _productsController.sink.add;
+  Function(Product) get productsIn => _productsController.add;
   Stream<Product> get productsOut => _productsController.stream;
 
-  final _listComplementosController = BehaviorSubject<List<Complemento>>();
+  final _listComplementosController =
+      BehaviorSubject<List<Complemento>>.seeded([]);
   Function(List<Complemento>) get complementoIn =>
-      _listComplementosController.sink.add;
+      _listComplementosController.add;
   Stream<List<Complemento>> get complementoOut =>
       _listComplementosController.stream;
 
-  final _listSaboresController = BehaviorSubject<List<Sabor>>();
-  Function(List<Sabor>) get saboresIn => _listSaboresController.sink.add;
+  final _listSaboresController = BehaviorSubject<List<Sabor>>.seeded([]);
+  Function(List<Sabor>) get saboresIn => _listSaboresController.add;
   Stream<List<Sabor>> get saboresOut => _listSaboresController.stream;
 
-  final _listOpcionaisController = BehaviorSubject<List<Opcional>>();
-  Function(List<Opcional>) get opcionaisIn => _listOpcionaisController.sink.add;
+  final _listOpcionaisController = BehaviorSubject<List<Opcional>>.seeded([]);
+  Function(List<Opcional>) get opcionaisIn => _listOpcionaisController.add;
   Stream<List<Opcional>> get opcionaisOut => _listOpcionaisController.stream;
+
+  final _listOpcionaisAddController =
+      BehaviorSubject<List<Opcional>>.seeded([]);
+  Function(List<Opcional>) get opcionaisAddIn =>
+      _listOpcionaisAddController.add;
+  Stream<List<Opcional>> get opcionaisAddOut =>
+      _listOpcionaisAddController.stream;
+
+  Product getProductSelected() {
+    return _productsController.value;
+  }
 
   getComplemento() async {
     List<Complemento> listComplementos = await getComplementosService(
@@ -46,6 +58,7 @@ class ItemBloc extends BlocBase {
                 0) {
           List<Complemento> listComplementos =
               _productsController.value.complementos ?? [];
+          complemento.quantidade = 1;
           listComplementos.add(complemento);
 
           Product product = _productsController.value;
@@ -55,6 +68,34 @@ class ItemBloc extends BlocBase {
         }
       }
     }
+  }
+
+  int obterQuantidadeItensOpcional(int categoriaId, int opcionalId) {
+    List<Opcional> listOpcionais = _listOpcionaisAddController.value;
+    int quantidadeTotal = 0;
+    if (listOpcionais.length > 0) {
+      List<Opcional> opcionaisCategoria = listOpcionais
+          .where((o) =>
+              o.categoriaOpcionalProdutoId == categoriaId &&
+              o.composicaoProdutoId == opcionalId)
+          .toList();
+      for (var cat in opcionaisCategoria) {
+        quantidadeTotal = quantidadeTotal + cat.quantidade;
+      }
+    }
+    return quantidadeTotal;
+  }
+
+  int obterQtdTotalCategoria(int categoriaId) {
+    List<Opcional> listOpcionais = _listOpcionaisAddController.value;
+    int quantidadeTotal = 0;
+    List<Opcional> listOpcionaisCategoria = listOpcionais
+        .where((o) => o.categoriaOpcionalProdutoId == categoriaId)
+        .toList();
+    for (var cat in listOpcionaisCategoria) {
+      quantidadeTotal = quantidadeTotal + cat.quantidade;
+    }
+    return quantidadeTotal;
   }
 
   getOpcionais() async {
@@ -83,23 +124,11 @@ class ItemBloc extends BlocBase {
   }
 
   clear() {
-    _listComplementosController.sink.add(null);
+    _listComplementosController.sink.add([]);
     _productsController.sink.add(null);
-    _listOpcionaisController.sink.add(null);
-    _listSaboresController.sink.add(null);
-  }
-
-  void addComplemento(Complemento complemento) {
-    if (!complemento.obrigatorio) {
-      List<Complemento> listComplementos =
-          _productsController.value.complementos ?? [];
-      listComplementos.add(complemento);
-
-      Product product = _productsController.value;
-      product.complementos = listComplementos;
-
-      _productsController.sink.add(product);
-    }
+    _listOpcionaisController.sink.add([]);
+    _listSaboresController.sink.add([]);
+    _listOpcionaisAddController.sink.add([]);
   }
 
   String addCarrinho(AppBloc appBloc, String obs) {
@@ -144,6 +173,7 @@ class ItemBloc extends BlocBase {
         return "Escolha pelo menos  ${_qntSaboresController.value} ${_qntSaboresController.value == 1 ? "sabor" : "sabores"}";
       } else {
         appBloc.addProductCarrinho(_productsController.value);
+        clear();
         return null;
       }
     } else {
@@ -151,27 +181,17 @@ class ItemBloc extends BlocBase {
     }
   }
 
-  void addOpcionais(Opcional opcional) {
-    List<Opcional> listOpcionais = _productsController.value.opcionais ?? [];
-    if (listOpcionais.contains(opcional)) {
-      listOpcionais.remove(opcional);
-      Product product = _productsController.value;
-      product.opcionais = listOpcionais;
-      _productsController.sink.add(product);
-    } else {
-      var opcionalCategiriaIncluso = _productsController.value.opcionais
-          .where((e) =>
-              e.categoriaOpcionalProdutoId ==
-              opcional.categoriaOpcionalProdutoId)
-          .toList();
-      if (opcionalCategiriaIncluso == null ||
-          opcionalCategiriaIncluso.length <
-              opcional.categoria.maximoOpcionais) {
-        listOpcionais.add(opcional);
-        Product product = _productsController.value;
-        product.opcionais = listOpcionais;
-        _productsController.sink.add(product);
+  void addComplemento(Complemento complemento) {
+    if (!complemento.obrigatorio) {
+      List<Complemento> listComplementos =
+          _productsController.value.complementos ?? [];
+      if (listComplementos.contains(complemento)) {
+        listComplementos.remove(complemento);
       }
+      if (complemento.quantidade > 0) listComplementos.add(complemento);
+      Product product = _productsController.value;
+      product.complementos = listComplementos;
+      _productsController.add(product);
     }
   }
 
@@ -180,23 +200,55 @@ class ItemBloc extends BlocBase {
       List<Complemento> listComplementos =
           _productsController.value.complementos ?? [];
       listComplementos.remove(complemento);
-
+      if (complemento.quantidade > 0) complemento.quantidade--;
+      listComplementos.add(complemento);
       Product product = _productsController.value;
       product.complementos = listComplementos;
-
       _productsController.sink.add(product);
     }
+  }
+
+  void addOpcionais(Opcional opcional) {
+    List<Opcional> listOpcionais = _productsController.value.opcionais ?? [];
+
+    int qtdItensCategoria =
+        obterQtdTotalCategoria(opcional.categoriaOpcionalProdutoId);
+    if (qtdItensCategoria < opcional.categoria.maximoOpcionais) {
+      if (listOpcionais.contains(opcional)) listOpcionais.remove(opcional);
+    }
+
+    if (qtdItensCategoria < opcional.categoria.maximoOpcionais) {
+      if (opcional.quantidade == null)
+        opcional.quantidade = 1;
+      else
+        opcional.quantidade++;
+      listOpcionais.add(opcional);
+      _listOpcionaisAddController.sink.add(listOpcionais);
+    }
+    _productsController.value.opcionais = _listOpcionaisAddController.value;
+    _productsController.sink.add(_productsController.value);
+  }
+
+  void removeOpcionais(Opcional opcional) {
+    List<Opcional> listOpcionais = _listOpcionaisAddController.value;
+    listOpcionais.remove(opcional);
+    if (opcional.quantidade > 0) opcional.quantidade--;
+    listOpcionais.add(opcional);
+    _listOpcionaisAddController.sink.add(listOpcionais);
+    Product product = _productsController.value;
+    product.opcionais = _listOpcionaisAddController.value;
+    _productsController.sink.add(product);
   }
 
   void addQnt({bool remove = false}) {
     if (!remove) {
       Product product = _productsController.value;
       product.quantidade = product.quantidade + 1;
-      _productsController.sink.add(product);
+      _productsController.add(product);
     } else {
       Product product = _productsController.value;
       if (product.quantidade != 1) product.quantidade = product.quantidade - 1;
-      _productsController.sink.add(product);
+      _productsController.add(product);
     }
   }
 
@@ -220,14 +272,14 @@ class ItemBloc extends BlocBase {
       listSabores.remove(sabor);
       Product product = _productsController.value;
       product.sabores = listSabores;
-      _productsController.sink.add(product);
+      _productsController.add(product);
     } else {
       if (_productsController.value.sabores.length <
           _qntSaboresController.value) {
         listSabores.add(sabor);
         Product product = _productsController.value;
         product.sabores = listSabores;
-        _productsController.sink.add(product);
+        _productsController.add(product);
       }
     }
   }
@@ -238,6 +290,7 @@ class ItemBloc extends BlocBase {
     _listComplementosController.close();
     _productsController.close();
     _listOpcionaisController.close();
+    _listOpcionaisAddController.close();
     _listSaboresController.close();
     _qntSaboresController.close();
   }

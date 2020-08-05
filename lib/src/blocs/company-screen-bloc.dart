@@ -5,61 +5,100 @@ import 'package:go_food_br/src/model/product-model.dart';
 import 'package:go_food_br/src/services/company-screen-service.dart';
 import 'package:rxdart/rxdart.dart';
 
-class CompanyScreenBloc extends BlocBase{
-
+class CompanyScreenBloc extends BlocBase {
   Company company;
 
   final _gruposController = BehaviorSubject<List<GrupoModel>>.seeded([]);
   Function(List<GrupoModel>) get gruposIn => _gruposController.sink.add;
   Stream<List<GrupoModel>> get gruposOut => _gruposController.stream;
 
-  final _productsController = BehaviorSubject<Map<GrupoModel, List<Product>>>.seeded({});
-  Function(Map<GrupoModel, List<Product>>) get productsIn => _productsController.sink.add;
-  Stream<Map<GrupoModel, List<Product>>> get productsOut => _productsController.stream;
+  final _allProductsPromoController = BehaviorSubject<List<Product>>();
+  Function(List<Product>) get allproductspromoIn =>
+      _allProductsPromoController.sink.add;
+  Stream<List<Product>> get allproductspromoOut =>
+      _allProductsPromoController.stream;
+
+  final _productsController =
+      BehaviorSubject<Map<GrupoModel, List<Product>>>.seeded({});
+  Function(Map<GrupoModel, List<Product>>) get productsIn =>
+      _productsController.sink.add;
+  Stream<Map<GrupoModel, List<Product>>> get productsOut =>
+      _productsController.stream;
 
   final _gruposSelectController = BehaviorSubject<List<GrupoModel>>.seeded([]);
-  Function(List<GrupoModel>) get gruposSelectIn => _gruposSelectController.sink.add;
-  Stream<List<GrupoModel>> get gruposSelectOut => _gruposSelectController.stream;
+  Function(List<GrupoModel>) get gruposSelectIn =>
+      _gruposSelectController.sink.add;
+  Stream<List<GrupoModel>> get gruposSelectOut =>
+      _gruposSelectController.stream;
 
-  selectGrupo(GrupoModel grupoModel){
-    if(_gruposSelectController.value.contains(grupoModel)){
+  selectGrupo(GrupoModel grupoModel) {
+    if (_gruposSelectController.value.contains(grupoModel)) {
       _gruposSelectController.value.remove(grupoModel);
-    }else{
+    } else {
       _gruposSelectController.value.add(grupoModel);
     }
     _gruposSelectController.sink.add(_gruposSelectController.value);
   }
 
-  void addCompany(Company company){
+  void addCompany(Company company) {
     this.company = company;
   }
 
-  getDataCompany()async{
+  List<Product> getAllProductsPromo() {
+    return _allProductsPromoController.value;
+  }
+
+  void loadProdutosCompany() {
     _gruposController.sink.add([]);
     _productsController.sink.add({});
-    bool grupos = await getGruposCompany(company: company, bloc: this);
-    if(grupos){
-      List<Product> listAllProdutos = await getProductsCompany(bloc: this, company: company);
-      List<GrupoModel> listaGrupos = _gruposController.value;
+    _allProductsPromoController.sink.add([]);
+    _productsController.sink.add(_productsController.value);
+    _allProductsPromoController.sink.add(_allProductsPromoController.value);
+    _gruposController.sink.add(_gruposController.value);
+  }
 
-      for(GrupoModel grupoModel in listaGrupos){
+  Company getCompany() {
+    return this.company;
+  }
+
+  getDataCompany() async {
+    _gruposController.sink.add([]);
+    _productsController.sink.add({});
+    List<Product> listAllProdutos =
+        await getProductsCompany(bloc: this, company: company);
+    List<Product> productsPromo = [];
+    if (listAllProdutos.length > 0) {
+      productsPromo.addAll(listAllProdutos);
+      productsPromo
+          .retainWhere((a) => double.parse(a.precoVendaPromocional) > 0);
+    }
+    if (productsPromo.length > 0)
+    {
+      _allProductsPromoController.sink.add(productsPromo);
+    }
+    bool grupos = await getGruposCompany(company: company, bloc: this);
+    if (grupos) {
+      List<GrupoModel> listaGrupos = _gruposController.value;
+      for (GrupoModel grupoModel in listaGrupos) {
         Map<GrupoModel, List<Product>> _products = _productsController.value;
-        List<Product> listProdutos = listAllProdutos.where((product) => product.grupoProdutoId == grupoModel.grupoProdutoId).toList();
-        if(listProdutos != null && listProdutos.length > 0){
+        List<Product> listProdutos = listAllProdutos
+            .where((product) =>
+                product.grupoProdutoId == grupoModel.grupoProdutoId)
+            .toList();
+        if (listProdutos != null && listProdutos.length > 0) {
           _products[grupoModel] = listProdutos;
         }
         _productsController.sink.add(_products);
       }
-
     }
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _gruposController.close();
     _productsController.close();
     _gruposSelectController.close();
+    _allProductsPromoController.close();
   }
 }

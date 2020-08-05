@@ -1,5 +1,6 @@
 import 'package:go_food_br/src/model/company-model.dart';
 import 'package:go_food_br/src/model/complemento-model.dart';
+import 'package:go_food_br/src/model/grupo-model.dart';
 import 'package:go_food_br/src/model/opcional.dart';
 import 'package:go_food_br/src/model/sabor.dart';
 
@@ -10,7 +11,6 @@ class Product {
   String codigoBarraProduto;
   String descricaoProduto;
   String precoVenda;
-  String grupoProduto;
   int grupoProdutoId;
   bool isAdicional;
   String quantidadeEstoque;
@@ -42,43 +42,42 @@ class Product {
   int quantidade = 1;
   String precoVendaPromocional = "0";
   Company company;
-
-
+  GrupoModel grupoProduto;
 
   Product(
       {this.produtoId,
-        this.codigoProduto,
-        this.indisponivel,
-        this.codigoBarraProduto,
-        this.descricaoProduto,
-        this.precoVenda,
-        this.grupoProduto,
-        this.grupoProdutoId,
-        this.precoVendaPromocional,
-        this.isAdicional,
-        this.quantidadeEstoque,
-        this.nomeAbreviado,
-        this.unidadeMedidaId,
-        this.unidadeMedidaCompraId,
-        this.unidadeMedida,
-        this.cardapioDigital,
-        this.itemCozinha,
-        this.itemProntaEntrega,
-        this.modoPreparo,
-        this.cozinhaId,
-        this.itemPorPeso,
-        this.fileName,
-        this.contentType,
-        this.content,
-        this.maximoSabores,
-        this.minimoSabores,
-        this.minimoOpcionais,
-        this.maximoOpcionais,
-        this.numeroFatias,
-        this.observacaoProdutos,
-        this.complementoProdutos,
-        this.saborProdutos,
-        this.composicaoProdutos});
+      this.codigoProduto,
+      this.indisponivel,
+      this.codigoBarraProduto,
+      this.descricaoProduto,
+      this.precoVenda,
+      this.grupoProduto,
+      this.grupoProdutoId,
+      this.precoVendaPromocional,
+      this.isAdicional,
+      this.quantidadeEstoque,
+      this.nomeAbreviado,
+      this.unidadeMedidaId,
+      this.unidadeMedidaCompraId,
+      this.unidadeMedida,
+      this.cardapioDigital,
+      this.itemCozinha,
+      this.itemProntaEntrega,
+      this.modoPreparo,
+      this.cozinhaId,
+      this.itemPorPeso,
+      this.fileName,
+      this.contentType,
+      this.content,
+      this.maximoSabores,
+      this.minimoSabores,
+      this.minimoOpcionais,
+      this.maximoOpcionais,
+      this.numeroFatias,
+      this.observacaoProdutos,
+      this.complementoProdutos,
+      this.saborProdutos,
+      this.composicaoProdutos});
 
   Product.fromJson(Map<String, dynamic> json) {
     precoVendaPromocional = json["PrecoVendaPromocional"].toString();
@@ -88,7 +87,6 @@ class Product {
     codigoBarraProduto = json['CodigoBarraProduto'].toString();
     descricaoProduto = json['DescricaoProduto'].toString();
     precoVenda = json['PrecoVenda'].toString();
-    grupoProduto = json['GrupoProduto'].toString();
     grupoProdutoId = json['GrupoProdutoId'];
     isAdicional = json['IsAdicional'];
     quantidadeEstoque = json['QuantidadeEstoque'].toString();
@@ -97,6 +95,9 @@ class Product {
     unidadeMedidaCompraId = json['UnidadeMedidaCompraId'].toString();
     unidadeMedida = json['UnidadeMedida'] != null
         ? new UnidadeMedida.fromJson(json['UnidadeMedida'])
+        : null;
+    grupoProduto = json['GrupoProduto'] != null
+        ? new GrupoModel.fromJson(json['GrupoProduto'])
         : null;
     cardapioDigital = json['CardapioDigital'];
     itemCozinha = json['ItemCozinha'];
@@ -143,8 +144,8 @@ class Product {
     data['CozinhaId'] = this.cozinhaId;
     data['ItemPorPeso'] = this.itemPorPeso;
     data['FileName'] = this.fileName;
-    if(image)data['ContentType'] = this.contentType;
-    if(image)data['Content'] = this.content;
+    if (image) data['ContentType'] = this.contentType;
+    if (image) data['Content'] = this.content;
     data['MaximoSabores'] = this.maximoSabores;
     data['MinimoSabores'] = this.minimoSabores;
     data['MinimoOpcionais'] = this.minimoOpcionais;
@@ -164,7 +165,9 @@ class Product {
     data["DataImpressao"] = null;
     data["DataInclusao"] = DateTime.now().toString();
     data["Quantidade"] = this.quantidade;
-    data["ValorUnitario"] = double.parse(precoVendaPromocional) > 0 ? double.parse(precoVendaPromocional) : double.parse(precoVenda);
+    data["ValorUnitario"] = double.parse(precoVendaPromocional) > 0
+        ? double.parse(precoVendaPromocional)
+        : double.parse(precoVenda);
     data["Observacao"] = observacaoProdutos;
     data["ValorDesconto"] = 0;
     data["ValorAcrescimo"] = 0;
@@ -174,63 +177,77 @@ class Product {
     data["SaborPedidoItens"] = getSabores();
     data["ComposicaoPedidoItens"] = getOpcionais();
     data["ComplementoPedidoItens"] = getComplementos();
-    if(data["SaborPedidoItens"].length > 0){
-      if(company.preferenciaMaiorPrecoSabor){
+    if (data["SaborPedidoItens"].length > 0) {
+      if (company.preferenciaMaiorPrecoSabor) {
         double maiorPrecoSabor = 0;
-        for(Sabor sabor in sabores){
-          if(double.parse(sabor.valorTotal) > maiorPrecoSabor) maiorPrecoSabor = double.parse(sabor.valorTotal);
+        for (Sabor sabor in sabores) {
+          if (double.parse(sabor.valorTotal) > maiorPrecoSabor)
+            maiorPrecoSabor = double.parse(sabor.valorTotal);
         }
-        data["ValorUnitario"] = maiorPrecoSabor;
-      }else{
-          double preco = 0;
-          for(Sabor sabor in sabores){
-            preco += double.parse(sabor.valorTotal) / sabores.length;
-          }
-        data["ValorUnitario"] = preco;
+        if (maiorPrecoSabor > 0) data["ValorUnitario"] = maiorPrecoSabor;
+      } else {
+        double preco = 0;
+        for (Sabor sabor in sabores) {
+          preco += double.parse(sabor.valorTotal) / sabores.length;
+        }
+        if (preco > 0) data["ValorUnitario"] = preco;
       }
     }
-    if(data["ComplementoPedidoItens"].length > 0){
+    if (data["ComplementoPedidoItens"].length > 0) {
       double valorAdicional = 0;
-      for(Complemento c in complementos){
-        valorAdicional += double.parse(c.produtoComplemento.precoVenda);
+      for (Complemento c in complementos) {
+        valorAdicional += double.parse(c.produtoComplemento.precoVenda) * c.quantidade;
       }
       data["ValorAcrescimo"] = valorAdicional * quantidade;
     }
-    data["ValorSubTotal"] = (quantidade * data["ValorUnitario"]) + data["ValorAcrescimo"] ;
+
+     if (data["ComposicaoPedidoItens"].length > 0) {
+      double valorOpcional = 0;
+      for (Opcional c in opcionais) {
+        valorOpcional += double.parse(c.valorTotal) * c.quantidade;
+      }
+      data["ValorAcrescimo"] = valorOpcional * quantidade;
+    }
+
+
+    data["ValorSubTotal"] =
+        (quantidade * data["ValorUnitario"]) + data["ValorAcrescimo"];
     data["ValorTotal"] = data["ValorSubTotal"];
     return data;
   }
 
-  List<Map<String,dynamic>> getSabores(){
-    List<Map<String,dynamic>> data = [];
-    for(Sabor sabor in this.sabores){
+  List<Map<String, dynamic>> getSabores() 
+  {
+    List<Map<String, dynamic>> data = [];
+    for (Sabor sabor in this.sabores) {
       data.add({
-        "SaborPedidoItemId": sabor.saborProdutoId,
+        "SaborPedidoItemId": 0,
         "Descricao": sabor.descricao,
       });
     }
     return data;
   }
 
-  List<Map<String,dynamic>> getOpcionais(){
-    List<Map<String,dynamic>> data = [];
-    for(Opcional opcional in this.opcionais){
+  List<Map<String, dynamic>> getOpcionais() {
+    List<Map<String, dynamic>> data = [];
+    for (Opcional opcional in this.opcionais) {
       data.add({
-        "ComposicaoPedidoItemId": opcional.composicaoProdutoId,
+        "ComposicaoPedidoItemId": 0,
         "Descricao": opcional.descricao,
+        "Quantidade": opcional.quantidade,
       });
     }
     return data;
   }
 
-  List<Map<String,dynamic>> getComplementos(){
-    List<Map<String,dynamic>> data = [];
-    for(Complemento complemento in this.complementos){
+  List<Map<String, dynamic>> getComplementos() {
+    List<Map<String, dynamic>> data = [];
+    for (Complemento complemento in this.complementos) {
       data.add({
-        "ComplementoPedidoItemId": complemento.complementoProdutoId,
+        "ComplementoPedidoItemId": 0,
         "Descricao": complemento.produtoComplemento.descricaoProduto,
-        "Quantidade": 1,
-        "ProdutoComplementoId": complemento.produtoComplementoId 
+        "Quantidade": complemento.quantidade,
+        "ProdutoComplementoId": complemento.produtoComplementoId
       });
     }
     return data;

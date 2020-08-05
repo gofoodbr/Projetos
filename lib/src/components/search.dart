@@ -4,11 +4,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_food_br/src/app-settings.dart';
 import 'package:go_food_br/src/blocs/filter-bloc.dart';
 
-class Search extends StatelessWidget {
+class Search extends StatefulWidget {
   final TextEditingController controller;
   Search(this.controller);
 
+  @override
+  _SearchState createState() => _SearchState();
+}
+
+class _SearchState extends State<Search> {
   FilterBloc filterBloc = BlocProvider.getBloc<FilterBloc>();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,9 +30,9 @@ class Search extends StatelessWidget {
                   color: Colors.grey.shade100,
                 ),
                 child: TextField(
-                  controller: controller,
+                  controller: widget.controller,
                   onEditingComplete: (){
-                    controller.text = "";
+                    widget.controller.text = "";
                     Navigator.pushNamed(context, "/filter_screen");
                   },
                   onChanged: (value){

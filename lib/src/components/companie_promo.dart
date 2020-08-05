@@ -59,7 +59,7 @@ Widget cardPromo(Company company, BuildContext context, CompanyScreenBloc compan
 
   return GestureDetector(
       onTap: (){
-        if(company.aberto == "true"){
+        if(company.aberto == "true" && company.offline == "false"){
           companyScreenBloc.addCompany(company);
           Navigator.pushNamed(context, "/company_screen");
         }
@@ -87,6 +87,7 @@ Widget cardPromo(Company company, BuildContext context, CompanyScreenBloc compan
                     height: ScreenUtil().setHeight(130),
                     fit: BoxFit.fitWidth,
                   ),
+                  company.lojaPromocao && company.descontoGofood == 'null' ? Container() :
                   Positioned(
                     top: ScreenUtil().setHeight(5),
                     left: ScreenUtil().setWidth(5),
@@ -110,7 +111,7 @@ Widget cardPromo(Company company, BuildContext context, CompanyScreenBloc compan
                       ),
                     ),
                   ),
-                  company.aberto == "true" ? Container(
+                  company.aberto == "true" && company.offline == "false" ? Container(
                     
                   ) : Container(
                     color: Colors.black.withOpacity(0.4),

@@ -1,5 +1,6 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_food_br/src/blocs/item-bloc.dart';
 import 'package:go_food_br/src/model/banner.dart';
 import 'package:go_food_br/src/model/company-model.dart';
 import 'package:go_food_br/src/model/cupom.dart';
@@ -7,14 +8,17 @@ import 'package:go_food_br/src/model/endereco-model.dart';
 import 'package:go_food_br/src/model/payment.dart';
 import 'package:go_food_br/src/model/product-model.dart';
 import 'package:go_food_br/src/model/user-model.dart';
+import 'package:go_food_br/src/services/cartao-cliente-service.dart';
 import 'package:go_food_br/src/services/geolocation-service.dart';
 import 'package:location/location.dart';
 import 'package:rxdart/rxdart.dart';
 import 'app-services.dart';
+import 'blocs/company-screen-bloc.dart';
+import 'model/FormaPagamentoDelivery.dart';
+import 'model/cartao_cliente.dart';
 import 'model/categories.dart';
 
-class AppBloc extends BlocBase{
-
+class AppBloc extends BlocBase {
   FirebaseUser firebaseUser;
   UserModel userModel;
   List<CategoriesModel> listCategories = [];
@@ -22,26 +26,52 @@ class AppBloc extends BlocBase{
   LocationData location;
   bool convidado = false;
   double cashback = 0;
+  double descontoLoja = 0;
   double troco = 0;
-
-  bool addCashback(double value){
-    if(value <= double.parse(userModel.saldoCashBack)){
+  final itemBloc = BlocProvider.getBloc<ItemBloc>();
+  bool addCashback(double value) {
+    if (value <= double.parse(userModel.saldoCashBack)) {
       cashback = value;
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
-  bool addTroco(double value){
+  void setDescontoLoja(double value) {
+      descontoLoja = value;
+  }
+
+  void addTroco(double value) {
     troco = value;
   }
 
-  void clearCarrinho(){
-    _carrinhoController.sink.add([]);
+  getTotal(
+    {double subtotal,
+    double frete = 0,
+    double descontoLoja = 1,
+    double descontoCupom = 0,
+    double cashBack = 0}) {
+  print(subtotal);
+  double valorDescontoLoja = subtotal * descontoLoja;
+  print(valorDescontoLoja);
+  double valorDescontoCupom = subtotal * descontoCupom;
+  print(valorDescontoCupom);
+  print(frete);
+  if (valorDescontoLoja > 0)
+  {
+    setDescontoLoja(valorDescontoLoja);
+  }
+  return subtotal - valorDescontoLoja - valorDescontoCupom - cashBack + frete;
+}
+
+  void clearCarrinho() {
+     _carrinhoController.sink.add([]);
     troco = 0;
     cashback = 0;
     _paymentController.sink.add(null);
+    _cardController.sink.add(null);
+    _formapagamentoController.sink.add(null);
     cupom = null;
   }
 
@@ -50,7 +80,8 @@ class AppBloc extends BlocBase{
   Stream<int> get loadOut => _loadController.stream;
 
   final _enderecosController = BehaviorSubject<List<EnderecoModel>>.seeded([]);
-  Function(List<EnderecoModel>) get enderecosIn => _enderecosController.sink.add;
+  Function(List<EnderecoModel>) get enderecosIn =>
+      _enderecosController.sink.add;
   Stream<List<EnderecoModel>> get enderecosOut => _enderecosController.stream;
 
   final _carrinhoController = BehaviorSubject<List<Product>>.seeded([]);
@@ -69,93 +100,108 @@ class AppBloc extends BlocBase{
   Function(Payment) get paymentIn => _paymentController.sink.add;
   Stream<Payment> get paymentOut => _paymentController.stream;
 
-  Payment getPayment() => _paymentController.value;
+  final _formapagamentoController = BehaviorSubject<FormaPagamentoDelivery>();
+  Function(FormaPagamentoDelivery) get formapagamentoIn =>
+      _formapagamentoController.sink.add;
+  Stream<FormaPagamentoDelivery> get formapagamentoOut =>
+      _formapagamentoController.stream;
 
-  List<EnderecoModel> getListEnderecos(){
+  final _paymentsOnlineController =
+      BehaviorSubject<List<FormaPagamentoDelivery>>.seeded([]);
+  Function(List<FormaPagamentoDelivery>) get paymentsOnlineIn =>
+      _paymentsOnlineController.sink.add;
+  Stream<List<FormaPagamentoDelivery>> get paymentsOnlineOut =>
+      _paymentsOnlineController.stream;
+
+  final _cardsController = BehaviorSubject<List<CartaoCliente>>();
+  Function(List<CartaoCliente>) get cardsIn => _cardsController.sink.add;
+  Stream<List<CartaoCliente>> get cardsOut => _cardsController.stream;
+
+  final _cardController = BehaviorSubject<CartaoCliente>();
+  Function(CartaoCliente) get cardIn => _cardController.sink.add;
+  Stream<CartaoCliente> get cardOut => _cardController.stream;
+
+  final companyScreenBloc = BlocProvider.getBloc<CompanyScreenBloc>();
+
+  FormaPagamentoDelivery getPayment() => _formapagamentoController.value;
+
+  List<EnderecoModel> getListEnderecos() {
     return _enderecosController.value;
   }
 
-  List<Company> getListCompanies(){
+  List<Company> getListCompanies() {
     return _companiesController.value;
   }
 
-  void initApp()async{
+  bool hasPaymentOnline() {
+    Company empresa = companyScreenBloc.getCompany();
+    if (empresa.baneseCardAtivo == null || empresa.zoopAtivo == null)
+      return false;
+    if (empresa.baneseCardAtivo || empresa.zoopAtivo) return true;
+    return false;
+  }
+
+  void initApp() async {
     var internet = await checkInternetAccess();
-    if (!internet){
+    if (!internet) {
       loadIn(1);
       return;
     }
 
-    await getLocation(timeOut: 10, appBloc: this);
-    if(location == null){
-      loadIn(10);
-      return;
-    }
-
     var user = await loadCurrentUser();
-    if(user != null){
+    if (user != null) {
       firebaseUser = user;
       loadData();
       return;
-    }else{
+    } else {
       loadIn(3);
       return;
     }
-
   }
 
-  void login()async{
+  void login() async {
     await signOutFirebase();
     FirebaseUser user = await signInWithGoogle();
-    if(user != null){
+    if (user != null) {
       firebaseUser = user;
       loadData();
-      return;
-    }else{
+    } else {
       loadIn(3);
       return;
     }
   }
 
-  void loadData({bool convidado = false})async{
-    loadIn(100);
-    if(!convidado) await getUser(this, credential: firebaseUser.uid);
-    if(userModel != null){
+  void loadData({bool convidado = false}) async {
+    if (!convidado) await getUser(this, credential: firebaseUser.uid);
+    if (userModel != null) {
       bool success = convidado ? true : await getEndereco();
-      if(success){
-        if(_enderecosController.value.length == 0){
+      if (success) {
+        if (_enderecosController.value.length == 0) {
           loadIn(5);
           return;
         }
-        bool categories = await getCategories(this);
-        bool bannerOk = await getBanner(this);
-
-        if(!categories || !bannerOk){
-          loadIn(7);
-          return;
-        }
-        bool companies = await getCompanies();
-        if(!companies){
-          loadIn(8);
-          return;
-        }
+        getCategories(this);
+        getBanner(this);
         loadIn(2);
         return;
-      }else {
+      } else {
         loadIn(6);
         return;
       }
-    }else{
+    } else {
       loadIn(4);
       return;
     }
   }
 
-  void modoConvidado(){
-    UserModel user = UserModel(
-      ativo: true,
-      nome: "Convidado"
-    );
+  Future<void> modoConvidado() async {
+    await getLocation(1, timeOut: 10, appBloc: this);
+    if (location == null) {
+      await getLocation(1, timeOut: 10, appBloc: this);
+      return;
+    }
+
+    UserModel user = UserModel(ativo: true, nome: "Convidado");
     userModel = user;
     EnderecoModel enderecoModel = EnderecoModel(
       latitude: location.latitude.toString(),
@@ -166,60 +212,105 @@ class AppBloc extends BlocBase{
     loadData(convidado: true);
   }
 
-  Future<bool> getEndereco()async{
+  CartaoCliente getCardSelected() {
+    return _cardController.value;
+  }
+
+  EnderecoModel getEnderecoSelected() {
+    return getListEnderecos()[0];
+  }
+
+  getPaymentsOnline() async {
+    return await getPaymentsOnlineService(
+        this, companyScreenBloc.getCompany().empresaId);
+  }
+
+  getCards() {
+    getCardsService(this, userModel.clienteId);
+  }
+
+  Future<bool> getEndereco() async {
     return getEnderecosService(this);
   }
 
-  Future<bool> getCompanies()async{
-    return getCompaniesService(this, lat: getListEnderecos()[0].latitude, lng: getListEnderecos()[0].longitude);
+  Future<bool> getCompanies() async {
+    return getCompaniesService(this,
+        lat: getListEnderecos()[0].latitude,
+        lng: getListEnderecos()[0].longitude);
   }
 
-  Future<bool> setEndereco(EnderecoModel enderecoModel)async{
+  Future<bool> setEndereco(EnderecoModel enderecoModel) async {
     List<EnderecoModel> listEnderecos = getListEnderecos();
-    listEnderecos.removeWhere((endereco)=> endereco.enderecoId == enderecoModel.enderecoId);
+    listEnderecos.removeWhere(
+        (endereco) => endereco.enderecoId == enderecoModel.enderecoId);
     listEnderecos.insert(0, enderecoModel);
     _enderecosController.sink.add(listEnderecos);
 
     return getCompanies();
-   }
+  }
 
-  void addProductCarrinho(Product product){
+  void addProductCarrinho(Product product) {
     List<Product> produtos = [];
     produtos.addAll(_carrinhoController.value);
-
     produtos.add(product);
     _carrinhoController.sink.add(produtos);
   }
 
   List<Product> getCarrinho() => _carrinhoController.value;
 
-  getPayments(){
-    getPaymentsService(this, getCarrinho()[0].company.empresaId);
+  getPayments() {
+    getPaymentsService(this, companyScreenBloc.getCompany().empresaId);
   }
 
-  Future<bool> deleteEndereco(int id)async{
+  Future<bool> deleteEndereco(int id) async {
     return deleteEnderecoService(this, id);
   }
 
   Cupom cupom;
 
-  Future<bool> getCupom(String value)async{
+  Future<bool> getCupom(String value) async {
     return cupomRequestService(this, value);
   }
 
-  Future<String> confirmPedido()async{
+  Future<int> registerCardUser(
+      {int formaPagamentoDeliveryId,
+      String numeroCartao,
+      String nomeTitular,
+      String ano,
+      String cvv,
+      String mes,
+      String cpf}) async {
+    bool register = await registerCardService(
+        formaPagamentoDeliveryId: formaPagamentoDeliveryId,
+        empresaId: getCarrinho()[0].company.empresaId,
+        clienteDeliveryId: userModel.clienteId,
+        numeroCartao: numeroCartao,
+        nomeTitular: nomeTitular,
+        ano: "20" + ano.split("/")[1],
+        cpf: cpf.replaceAll(".", ""),
+        cvv: cvv,
+        mes: mes.split("/")[0]);
+    if (register) {
+      return 5;
+    } else {
+      return 6;
+    }
+  }
+
+  Future<String> confirmPedido() async {
     loadIn(null);
     double valorTotal = 0;
 
-    for(Product product in getCarrinho()){
+    for (Product product in getCarrinho()) {
       valorTotal += product.toCarrinho()["ValorTotal"];
     }
 
-    double valorDesconto = 0;
-    if(cupom != null){
-      valorDesconto = (double.parse(cupom.descontoPremiacao)/100) * valorTotal;
+    if (getCarrinho()[0].company.pedidoMinimo != null &&
+        double.parse(getCarrinho()[0].company.pedidoMinimo) > valorTotal) {
+      loadIn(100);
+      return "Pedido menor que o valor minino permitido!";
     }
-    
+
     bool value = await setPedidoService(
       this,
       cashBack: cashback,
@@ -227,12 +318,16 @@ class AppBloc extends BlocBase{
       cupom: cupom,
       enderecoModel: getListEnderecos()[0],
       listProducts: getCarrinho(),
-      payment: _paymentController.value,
+      payment: _formapagamentoController.value,
       userModel: userModel,
+      card: _cardController.value,
       valorPago: troco,
+      descontoLoja: descontoLoja
     );
-    if(value) loadIn(1);
-    else loadIn(100);
+    if (value)
+      loadIn(1);
+    else
+      loadIn(100);
     return value ? null : "Erro ao confirmar pedido";
   }
 
@@ -245,5 +340,9 @@ class AppBloc extends BlocBase{
     _carrinhoController.close();
     _paymentsController.close();
     _paymentController.close();
+    _paymentsOnlineController.close();
+    _cardsController.close();
+    _cardController.close();
+    _formapagamentoController.close();
   }
 }

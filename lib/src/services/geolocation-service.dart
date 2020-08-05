@@ -1,9 +1,26 @@
+import 'dart:io';
+
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:go_food_br/src/app-bloc.dart';
 import 'package:go_food_br/src/model/endereco-model.dart';
 import 'package:location/location.dart';
 
-Future<Null> getLocation({int timeOut, AppBloc appBloc}) async {
+Dio getDioHttp()
+{
+  var dio = Dio();
+  if (Platform.isAndroid) {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
+  }
+  return dio;
+}
+
+Future<Null> getLocation(int i, {int timeOut, AppBloc appBloc}) async {
   bool result;
   int contador = 1;
   while (contador <= 3) {
@@ -31,7 +48,7 @@ Future<bool> _getLocation({int timeOut, AppBloc appBloc}) async {
     LocationData location = await _locationService.getLocation()
         .timeout(_timeOut)
         .catchError((e) {
-      throw e;
+       throw e;
     });
 
     appBloc.location = location;
@@ -43,7 +60,7 @@ Future<bool> _getLocation({int timeOut, AppBloc appBloc}) async {
 }
 
 Future<EnderecoModel> getEnderecoService({int timeOut, String lat, String lng}) async {
-  Dio dio = Dio();
+  Dio dio = getDioHttp();
 
   try {
     Response response = await dio.get(
