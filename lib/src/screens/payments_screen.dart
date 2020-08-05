@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:go_food_br/src/app-settings.dart';
+import 'package:go_food_br/src/components/navigation.dart';
 import 'package:go_food_br/src/model/cartao_cliente.dart';
 import 'package:go_food_br/src/model/payment.dart';
 import 'package:google_fonts/google_fonts.dart';

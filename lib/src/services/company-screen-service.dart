@@ -45,6 +45,7 @@ Future<bool> getGruposCompany({
       for(var a in response.data){
         listGrupos.add(GrupoModel.fromJson(a));
       }
+      bloc.gruposIn([]);
       bloc.gruposIn(listGrupos);
       return true;
     } else {

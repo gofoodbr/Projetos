@@ -43,6 +43,7 @@ class _HistoricoPedidoState extends State<HistoricoPedido> {
     return WillPopScope(
       onWillPop: () async {
         historicoBloc.pedidoIn(null);
+        Navigator.pop(context);
         return true;
       },
       child: Scaffold(

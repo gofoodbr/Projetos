@@ -372,7 +372,8 @@ Future<bool> setPedidoService(AppBloc appBloc,
     CartaoCliente card,
     EnderecoModel enderecoModel,
     double valorPago,
-    double cashBack}) async {
+    double cashBack,
+    double descontoLoja}) async {
   Dio dio = getDioHttp();
 
   List<Map<String, dynamic>> listProductsCarrinho = [];
@@ -389,6 +390,10 @@ Future<bool> setPedidoService(AppBloc appBloc,
   double valorDesconto = 0;
   if (cupom != null) {
     valorDesconto = (double.parse(cupom.descontoPremiacao) / 100) * valorTotal;
+  }
+
+  if (descontoLoja > 0){
+    valorDesconto = descontoLoja;
   }
 
   String date = DateTime.now().toIso8601String();

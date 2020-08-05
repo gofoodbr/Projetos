@@ -10,15 +10,17 @@ class FloatingButtonHome extends StatefulWidget {
 }
 
 class _FloatingButtonHomeState extends State<FloatingButtonHome> {
-  final appBloc = BlocProvider.getBloc<AppBloc>();  
+  final appBloc = BlocProvider.getBloc<AppBloc>();
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-            backgroundColor: primaryColor,
-            child: new Icon(Icons.update),
-            onPressed: () {
-              appBloc.getCompanies();
-            },
-          );
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 50.0),
+        child: FloatingActionButton(
+          backgroundColor: primaryColor,
+          child: new Icon(Icons.update),
+          onPressed: () {
+            appBloc.getCompanies();
+          },
+        ));
   }
 }

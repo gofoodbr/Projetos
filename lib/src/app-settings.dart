@@ -69,21 +69,6 @@ double getValorProduto(Product product) {
   return valor;
 }
 
-getTotal(
-    {double subtotal,
-    double frete = 0,
-    double descontoLoja = 1,
-    double descontoCupom = 1,
-    double cashBack = 0}) {
-  print(subtotal);
-  double valorDescontoLoja = subtotal * descontoLoja;
-  print(valorDescontoLoja);
-  double valorDescontoCupom = subtotal * descontoCupom;
-  print(valorDescontoCupom);
-  print(frete);
-  return subtotal - valorDescontoLoja - valorDescontoCupom - cashBack + frete;
-}
-
 Map<String, dynamic> getDateString({DateTime dateTime}) {
   Map<String, dynamic> result = {};
   List<String> days = [

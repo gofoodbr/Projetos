@@ -11,6 +11,7 @@ import 'package:go_food_br/src/components/companie_promo.dart';
 import 'package:go_food_br/src/components/companies.dart';
 import 'package:go_food_br/src/components/floatingButtonHome.dart';
 import 'package:go_food_br/src/components/location.dart';
+import 'package:go_food_br/src/components/navigation.dart';
 import 'package:go_food_br/src/components/search.dart';
 import 'package:go_food_br/src/model/bottom_navigator_item.dart';
 import 'package:go_food_br/src/model/company-model.dart';
@@ -62,12 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<BottomNavigationBarItem> _buildBottomIcon() => menus
-        .map((menu) => BottomNavigationBarItem(
-              icon: Icon(menu.icon, color: Colors.black),
-              title: Text(menu.text, style: TextStyle(color: Colors.black)),
-            ))
-        .toList();
     return Scaffold(
       floatingActionButton: FloatingButtonHome(),
       backgroundColor: Colors.grey.shade100,
@@ -109,10 +104,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                     List<Company> companiesPromo = [];
                     companiesPromo.addAll(snapshot.data);
-                    companiesPromo
-                        .retainWhere((a) => a.descontoGofood != "null" || a.lojaPromocao);
-                    companiesPromo.sort((a, b) => double.parse(b.descontoGofood == 'null' ? '0' : b.descontoGofood)
-                        .compareTo(double.parse(a.descontoGofood == 'null' ? '0' : a.descontoGofood)));
+                    companiesPromo.retainWhere(
+                        (a) => a.descontoGofood != "null" || a.lojaPromocao);
+                    companiesPromo.sort((a, b) => double.parse(
+                            b.descontoGofood == 'null' ? '0' : b.descontoGofood)
+                        .compareTo(double.parse(a.descontoGofood == 'null'
+                            ? '0'
+                            : a.descontoGofood)));
 
                     return companiesPromo.length == 0
                         ? Container()
@@ -130,22 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
       bottomSheet: bottomBarCarrinho(appBloc, context),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        elevation: 20,
-        onTap: (value) {
-          if (value == 1)
-            Navigator.pushReplacementNamed(context, '/filter_screen');
-          if (!appBloc.convidado) {
-            if (value == 3)
-              Navigator.pushReplacementNamed(context, '/profile_screen');
-            if (value == 2)
-              Navigator.pushReplacementNamed(context, "/pedidos_screen");
-          }
-        },
-        items: _buildBottomIcon(),
-      ),
+      bottomNavigationBar: bottomNavigation(appBloc, context),
     );
   }
 }

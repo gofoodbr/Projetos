@@ -59,12 +59,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     sexo = value;
                   });
                 }),
-                dataInput("CPF (Opcional)",
-                    controller: _cpfController,
-                    textInputAction: TextInputType.number),
-                dataInput("Código Cashback (Opcional)",
-                    controller: _codeController,
-                    textInputAction: TextInputType.text),
                 Padding(
                   padding: EdgeInsets.only(top: ScreenUtil().setHeight(20)),
                   child: Row(
@@ -158,7 +152,7 @@ Widget header(String name) {
             height: ScreenUtil().setHeight(70),
           ),
           Text(
-            "Olá, $name. Precisamos\nsaber mais sobre você!",
+            "Olá, $name. Precisamos\nde mais alguns dados!",
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w500,

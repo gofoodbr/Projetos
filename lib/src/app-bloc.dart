@@ -26,6 +26,7 @@ class AppBloc extends BlocBase {
   LocationData location;
   bool convidado = false;
   double cashback = 0;
+  double descontoLoja = 0;
   double troco = 0;
   final itemBloc = BlocProvider.getBloc<ItemBloc>();
   bool addCashback(double value) {
@@ -37,9 +38,32 @@ class AppBloc extends BlocBase {
     }
   }
 
+  void setDescontoLoja(double value) {
+      descontoLoja = value;
+  }
+
   void addTroco(double value) {
     troco = value;
   }
+
+  getTotal(
+    {double subtotal,
+    double frete = 0,
+    double descontoLoja = 1,
+    double descontoCupom = 0,
+    double cashBack = 0}) {
+  print(subtotal);
+  double valorDescontoLoja = subtotal * descontoLoja;
+  print(valorDescontoLoja);
+  double valorDescontoCupom = subtotal * descontoCupom;
+  print(valorDescontoCupom);
+  print(frete);
+  if (valorDescontoLoja > 0)
+  {
+    setDescontoLoja(valorDescontoLoja);
+  }
+  return subtotal - valorDescontoLoja - valorDescontoCupom - cashBack + frete;
+}
 
   void clearCarrinho() {
      _carrinhoController.sink.add([]);
@@ -298,6 +322,7 @@ class AppBloc extends BlocBase {
       userModel: userModel,
       card: _cardController.value,
       valorPago: troco,
+      descontoLoja: descontoLoja
     );
     if (value)
       loadIn(1);

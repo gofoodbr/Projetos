@@ -40,6 +40,7 @@ class _ProductScreenState extends State<ProductScreen> {
     return WillPopScope(
       onWillPop: () async {
         itemBloc.clear();
+        Navigator.pop(context);
         return true;
       },
       child: StreamBuilder<Product>(
@@ -926,7 +927,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       String result =
                           itemBloc.addCarrinho(appBloc, obsController.text);
                       if (result == null) {
-                        Navigator.pushNamed(context, "/company_screen");
+                        Navigator.popAndPushNamed(context, "/company_screen");
                       } else {
                         if (result == "modal") {
                           showRoundedModalBottomSheet(

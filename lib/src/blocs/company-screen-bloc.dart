@@ -12,9 +12,11 @@ class CompanyScreenBloc extends BlocBase {
   Function(List<GrupoModel>) get gruposIn => _gruposController.sink.add;
   Stream<List<GrupoModel>> get gruposOut => _gruposController.stream;
 
-  final _allProductsController = BehaviorSubject<List<Product>>.seeded([]);
-  Function(List<Product>) get allproductsIn => _allProductsController.sink.add;
-  Stream<List<Product>> get allproductsOut => _allProductsController.stream;
+  final _allProductsPromoController = BehaviorSubject<List<Product>>();
+  Function(List<Product>) get allproductspromoIn =>
+      _allProductsPromoController.sink.add;
+  Stream<List<Product>> get allproductspromoOut =>
+      _allProductsPromoController.stream;
 
   final _productsController =
       BehaviorSubject<Map<GrupoModel, List<Product>>>.seeded({});
@@ -42,16 +44,16 @@ class CompanyScreenBloc extends BlocBase {
     this.company = company;
   }
 
-  List<Product> getAllProducts() {
-    return _allProductsController.value;
-  }   
- 
-  void loadProdutosCompany(){
-     _gruposController.sink.add([]);
+  List<Product> getAllProductsPromo() {
+    return _allProductsPromoController.value;
+  }
+
+  void loadProdutosCompany() {
+    _gruposController.sink.add([]);
     _productsController.sink.add({});
-    _allProductsController.sink.add([]);
+    _allProductsPromoController.sink.add([]);
     _productsController.sink.add(_productsController.value);
-    _allProductsController.sink.add(_allProductsController.value);
+    _allProductsPromoController.sink.add(_allProductsPromoController.value);
     _gruposController.sink.add(_gruposController.value);
   }
 
@@ -62,12 +64,21 @@ class CompanyScreenBloc extends BlocBase {
   getDataCompany() async {
     _gruposController.sink.add([]);
     _productsController.sink.add({});
+    List<Product> listAllProdutos =
+        await getProductsCompany(bloc: this, company: company);
+    List<Product> productsPromo = [];
+    if (listAllProdutos.length > 0) {
+      productsPromo.addAll(listAllProdutos);
+      productsPromo
+          .retainWhere((a) => double.parse(a.precoVendaPromocional) > 0);
+    }
+    if (productsPromo.length > 0)
+    {
+      _allProductsPromoController.sink.add(productsPromo);
+    }
     bool grupos = await getGruposCompany(company: company, bloc: this);
     if (grupos) {
-      List<Product> listAllProdutos =
-          await getProductsCompany(bloc: this, company: company);
       List<GrupoModel> listaGrupos = _gruposController.value;
-      _allProductsController.sink.add(listAllProdutos);       
       for (GrupoModel grupoModel in listaGrupos) {
         Map<GrupoModel, List<Product>> _products = _productsController.value;
         List<Product> listProdutos = listAllProdutos
@@ -88,6 +99,6 @@ class CompanyScreenBloc extends BlocBase {
     _gruposController.close();
     _productsController.close();
     _gruposSelectController.close();
-    _allProductsController.close();
+    _allProductsPromoController.close();
   }
 }
