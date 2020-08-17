@@ -59,6 +59,9 @@ Widget cardPromo(Product product, BuildContext context, AppBloc appBloc) {
   return GestureDetector(
       onTap: () {
         product.company = companyScreenBloc.company;
+        product.opcionais.clear();
+        product.sabores.clear();
+        product.complementos.clear();
         itemBloc.productsIn(product);
         Navigator.pushNamed(context, "/item_screen");
       },

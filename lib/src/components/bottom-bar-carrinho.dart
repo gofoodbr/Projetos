@@ -29,7 +29,11 @@ Widget bottomBarCarrinho(AppBloc appBloc, BuildContext context) {
           for (Product product in snapshot.data) {
             quantidade += product.quantidade;
             double valorProduto = 0;
-            valorProduto += double.parse(product.precoVenda);
+            if (double.parse(product.precoVendaPromocional) > 0) {
+              valorProduto += double.parse(product.precoVendaPromocional);
+            } else {
+              valorProduto += double.parse(product.precoVenda);
+            }
             if (product.company.preferenciaMaiorPrecoSabor &&
                 product.sabores.length > 0) {
               double maiorPrecoSabor = 0;
